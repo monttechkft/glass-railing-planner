@@ -52,6 +52,21 @@ npm run preview
 
 Open the local address printed by Vite.
 
+## GitHub Pages deployment
+
+The workflow in `.github/workflows/deploy-pages.yml` automatically installs
+dependencies, builds the application, and publishes the `dist` directory to
+GitHub Pages whenever a commit is pushed to the `main` branch. It can also be
+started manually from the repository's **Actions** tab.
+
+Before the first deployment, open the GitHub repository and select **Settings
+→ Pages → Build and deployment → Source → GitHub Actions**. Subsequent pushes
+to `main` will update the published site automatically.
+
+The workflow supplies the repository name as Vite's base path. Local
+development continues to run from `/`, while the deployed assets load from the
+GitHub Project Pages subdirectory.
+
 ## How to use the planner
 
 1. Select a **Railing system**.
@@ -121,4 +136,6 @@ need an Excel file or a database at runtime.
   aggregation
 - `src/calculator.js` — railing calculations and plan selection
 - `src/style.css` — interface and layout styling
+- `vite.config.js` — local and GitHub Pages base-path configuration
+- `.github/workflows/deploy-pages.yml` — automatic GitHub Pages deployment
 - `glass_inventory.json` — embedded glass inventory

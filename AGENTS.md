@@ -34,8 +34,16 @@ workspace. At minimum, use `node --check src/main.js`,
 - `src/style.css` contains all application styling.
 - `glass_inventory.json` is the embedded inventory consumed at build/runtime.
 - `README.md` contains installation, build, and end-user instructions.
+- `vite.config.js` reads `VITE_BASE_PATH` for GitHub Project Pages builds while
+  keeping local development at `/`.
+- `.github/workflows/deploy-pages.yml` builds and deploys `dist` on pushes to
+  `main` and supports manual runs.
 
 The original Python and Excel files are not currently present in the workspace.
+
+GitHub Pages must use **Settings → Pages → Source: GitHub Actions**. The workflow
+sets `VITE_BASE_PATH` to `/${{ github.event.repository.name }}/`, matching this
+repository's Project Pages URL structure.
 
 ## Railing systems
 
