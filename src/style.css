@@ -392,6 +392,15 @@ select:focus {
   scrollbar-width: thin;
 }
 
+.component-sequence-text {
+  margin: -8px 0 22px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
 .panel-chip {
   display: grid;
   flex: none;

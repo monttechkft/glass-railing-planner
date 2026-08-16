@@ -1,5 +1,6 @@
 import productCsvText from '../glass_inventory.csv?raw';
 import {
+  calculateCustomCutPrice,
   calculateProject,
   CalculatorError,
   RAIL_VARIANTS,
@@ -16,6 +17,9 @@ try {
 } catch (error) {
   productDataError = error;
 }
+const productsByCode = new Map(
+  products.map((product) => [product.productCode, product]),
+);
 let visibleSectionCount = 1;
 
 // Cache the permanent page elements once. Section controls are rebuilt when
@@ -39,9 +43,31 @@ function formatMillimetres(value) {
   return `${formatted} mm`;
 }
 
+/** Format a base-rail material length in metres without unnecessary zeros. */
+function formatMetres(lengthMillimetres) {
+  const metres = lengthMillimetres / 1000;
+  return `${new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 3,
+  }).format(metres)} m`;
+}
+
 /** Format a glass panel as height x width with one shared mm unit. */
 function formatGlassDimensions(height, width) {
   return `${height} x ${width} mm`;
+}
+
+/** Format an inventory or calculated price in Hungarian forints. */
+function formatHuf(value) {
+  return `${new Intl.NumberFormat('en-US').format(value)} HUF`;
+}
+
+/** Look up one required inventory price using its stable product code. */
+function getProductPrice(productCode) {
+  const product = productsByCode.get(productCode);
+  if (!product) {
+    throw new InventoryCsvError(`No product exists for code "${productCode}".`);
+  }
+  return product.price;
 }
 
 /** Create an element and optionally assign a class and safe text content. */
@@ -276,6 +302,7 @@ function renderGlassBillOfMaterials(calculatedSections) {
         productCode,
         height: result.height,
         width,
+        unitPrice: getProductPrice(productCode),
         quantity: 0,
       };
       current.quantity += 1;
@@ -294,7 +321,13 @@ function renderGlassBillOfMaterials(calculatedSections) {
   const caption = createElement('caption', null, 'Glass bill of materials');
   const head = document.createElement('thead');
   const headRow = document.createElement('tr');
-  ['Product code', 'Quantity', 'Line total'].forEach((label) => {
+  [
+    'Product code',
+    'Quantity',
+    'Line total',
+    'Unit price',
+    'Total price',
+  ].forEach((label) => {
     headRow.append(createElement('th', null, label));
   });
   head.append(headRow);
@@ -306,19 +339,30 @@ function renderGlassBillOfMaterials(calculatedSections) {
       createElement('td', null, item.productCode),
       createElement('td', null, String(item.quantity)),
       createElement('td', null, formatMillimetres(item.width * item.quantity)),
+      createElement('td', null, formatHuf(item.unitPrice)),
+      createElement('td', null, formatHuf(item.unitPrice * item.quantity)),
     );
     body.append(row);
   });
 
-  const total = items.reduce(
+  const totalWidth = items.reduce(
     (sum, item) => sum + item.width * item.quantity,
+    0,
+  );
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.unitPrice * item.quantity,
     0,
   );
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
   const totalLabel = createElement('th', null, 'Glass total');
   totalLabel.colSpan = 2;
-  footRow.append(totalLabel, createElement('td', null, formatMillimetres(total)));
+  footRow.append(
+    totalLabel,
+    createElement('td', null, formatMillimetres(totalWidth)),
+    createElement('td'),
+    createElement('td', null, formatHuf(totalPrice)),
+  );
   foot.append(footRow);
 
   table.append(caption, head, body, foot);
@@ -333,29 +377,38 @@ function renderPostBillOfMaterials(rows) {
   const caption = createElement('caption', null, 'Post bill of materials');
   const head = document.createElement('thead');
   const headRow = document.createElement('tr');
-  ['Product code', 'Quantity'].forEach((label) => {
+  ['Product code', 'Quantity', 'Unit price', 'Total price'].forEach((label) => {
     headRow.append(createElement('th', null, label));
   });
   head.append(headRow);
 
   const body = document.createElement('tbody');
-  rows
-    .filter((row) => row.quantity > 0)
+  const activeRows = rows.filter((row) => row.quantity > 0);
+  activeRows
     .forEach((item) => {
+      const unitPrice = getProductPrice(item.name);
       const row = document.createElement('tr');
       row.append(
         createElement('td', null, item.name),
         createElement('td', null, String(item.quantity)),
+        createElement('td', null, formatHuf(unitPrice)),
+        createElement('td', null, formatHuf(unitPrice * item.quantity)),
       );
       body.append(row);
     });
 
-  const totalQuantity = rows.reduce((sum, row) => sum + row.quantity, 0);
+  const totalQuantity = activeRows.reduce((sum, row) => sum + row.quantity, 0);
+  const totalPrice = activeRows.reduce(
+    (sum, row) => sum + getProductPrice(row.name) * row.quantity,
+    0,
+  );
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
   footRow.append(
     createElement('th', null, 'Post total'),
     createElement('td', null, String(totalQuantity)),
+    createElement('td'),
+    createElement('td', null, formatHuf(totalPrice)),
   );
   foot.append(footRow);
 
@@ -399,18 +452,20 @@ function renderProjectPostBillOfMaterials(calculatedSections) {
   return null;
 }
 
-/** Aggregate standard bars and distinct custom-cut lengths across sections. */
+/** Aggregate standard bars and total custom-cut length across sections. */
 function renderBaseRailBillOfMaterials(calculatedSections) {
-  const railLabel = calculatedSections[0].result.railVariant.label;
+  const firstResult = calculatedSections[0].result;
+  const { standardBar, customCut } =
+    firstResult.systemDetails.profileProductCodes;
+  const barUnitPrice = getProductPrice(standardBar);
+  const customCutPricePerMetre = getProductPrice(customCut);
   let barCount = 0;
-  const customCuts = new Map();
+  let customCutTotalLength = 0;
 
   calculatedSections.forEach(({ result }) => {
     const { barCount: sectionBars, cutLength } = result.systemDetails.profile;
     barCount += sectionBars;
-    if (cutLength > 0) {
-      customCuts.set(cutLength, (customCuts.get(cutLength) ?? 0) + 1);
-    }
+    customCutTotalLength += cutLength;
   });
 
   const tableWrapper = createElement('div', 'bom-table-wrapper post-bom');
@@ -418,7 +473,7 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   const caption = createElement('caption', null, 'Base-rail bill of materials');
   const head = document.createElement('thead');
   const headRow = document.createElement('tr');
-  ['Rail type', 'Quantity'].forEach((label) => {
+  ['Product code', 'Quantity', 'Unit price', 'Total price'].forEach((label) => {
     headRow.append(createElement('th', null, label));
   });
   head.append(headRow);
@@ -426,35 +481,40 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   const body = document.createElement('tbody');
   const barRow = document.createElement('tr');
   barRow.append(
-    createElement('td', null, `${railLabel} (2.5m Bar)`),
+    createElement('td', null, standardBar),
     createElement('td', null, String(barCount)),
+    createElement('td', null, formatHuf(barUnitPrice)),
+    createElement('td', null, formatHuf(barUnitPrice * barCount)),
   );
   body.append(barRow);
 
-  [...customCuts]
-    .sort(([lengthA], [lengthB]) => lengthA - lengthB)
-    .forEach(([cutLength, quantity]) => {
-      const row = document.createElement('tr');
-      row.append(
-        createElement(
-          'td',
-          null,
-          `${railLabel} (${formatMillimetres(cutLength)} Custom Cut)`,
-        ),
-        createElement('td', null, String(quantity)),
-      );
-      body.append(row);
-    });
-
-  const customCutQuantity = [...customCuts.values()].reduce(
-    (sum, quantity) => sum + quantity,
-    0,
+  // Custom cuts are sold by length. Combine every section into one metre-based
+  // row instead of showing each cut as a separate piece.
+  const customCutTotalPrice = calculateCustomCutPrice(
+    customCutTotalLength,
+    customCutPricePerMetre,
   );
+  if (customCutTotalLength > 0) {
+    const customCutRow = document.createElement('tr');
+    customCutRow.append(
+      createElement('td', null, customCut),
+      createElement('td', null, formatMetres(customCutTotalLength)),
+      createElement('td', null, formatHuf(customCutPricePerMetre)),
+      createElement('td', null, formatHuf(customCutTotalPrice)),
+    );
+    body.append(customCutRow);
+  }
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
   footRow.append(
     createElement('th', null, 'Base-Rail total'),
-    createElement('td', null, String(barCount + customCutQuantity)),
+    createElement('td'),
+    createElement('td'),
+    createElement(
+      'td',
+      null,
+      formatHuf(barUnitPrice * barCount + customCutTotalPrice),
+    ),
   );
   foot.append(footRow);
 
@@ -515,6 +575,25 @@ function renderLayoutSequence(glassSequence, productCodeSequence, result) {
   return wrapper;
 }
 
+/** Build the same left-to-right product-code order shown by the layout boxes. */
+function buildComponentCodeSequence(glassProductCodes, result) {
+  if (result.system === 'vonalmenti') return glassProductCodes;
+
+  const sequence = [];
+  result.systemDetails.postProductCodeSequence.forEach((postCode, index) => {
+    sequence.push(postCode);
+    if (index < glassProductCodes.length) {
+      sequence.push(glassProductCodes[index]);
+    }
+  });
+  return sequence;
+}
+
+/** Format component codes with a separator at both outer edges. */
+function formatComponentCodeSequence(componentCodes) {
+  return `| ${componentCodes.join(' | ')} |`;
+}
+
 /** Render one active section and its independently optimized layout. */
 function renderSectionLayout(calculatedSection) {
   const { number, result } = calculatedSection;
@@ -528,6 +607,13 @@ function renderSectionLayout(calculatedSection) {
   block.append(
     heading,
     renderLayoutSequence(plan.sequence, plan.productCodeSequence, result),
+    createElement(
+      'p',
+      'component-sequence-text',
+      formatComponentCodeSequence(
+        buildComponentCodeSequence(plan.productCodeSequence, result),
+      ),
+    ),
   );
   return block;
 }

@@ -111,6 +111,8 @@ groups custom cuts by length.
 ## Understanding the results
 
 - Each active section has a separate graphical layout.
+- A text representation beneath each layout lists the same component sequence
+  as `| productCode | productCode | ... |`.
 - Each glass box is labelled with the exact `productCode` selected from the
   inventory CSV. Hovering over a glass box shows its dimensions.
 - Post boxes and the Post Bill of Materials use their selected inventory
@@ -122,6 +124,9 @@ groups custom cuts by length.
   section and identifies each item by its inventory `productCode`.
 - The Post or Base-Rail Bill of Materials contains totals for the entire
   project, not separate totals for each section.
+- BoM prices are shown in HUF and come from the CSV `price` column. For
+  base-rail custom-cut (`-V`) products, `price` is interpreted as a per-metre
+  rate. Their BoM quantity is the aggregated required length in metres.
 - The planner returns one recommended plan for each active section.
 
 ## Inventory data

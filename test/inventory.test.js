@@ -1,7 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { calculatePlans, calculateProject } from '../src/calculator.js';
+import {
+  calculateCustomCutPrice,
+  calculatePlans,
+  calculateProject,
+} from '../src/calculator.js';
 import {
   parseInventoryCsv,
   PRODUCT_CATEGORY_CODES,
@@ -14,8 +18,14 @@ const csvText = await readFile(
 );
 const products = parseInventoryCsv(csvText);
 
+test('custom base-rail cuts scale their CSV price-per-metre by length', () => {
+  assert.equal(calculateCustomCutPrice(1000, 30550), 30550);
+  assert.equal(calculateCustomCutPrice(1500, 30550), 45825);
+  assert.equal(calculateCustomCutPrice(1500, 30605), 45907.5);
+});
+
 test('CSV parsing preserves all product rows and column-based names', () => {
-  assert.equal(products.length, 86);
+  assert.equal(products.length, 88);
   assert.equal(
     products.filter(
       (product) => product.productCategory === PRODUCT_CATEGORY_CODES.glass,
@@ -27,7 +37,7 @@ test('CSV parsing preserves all product rows and column-based names', () => {
       (product) =>
         product.productCategory === PRODUCT_CATEGORY_CODES.railingComponent,
     ).length,
-    12,
+    14,
   );
   assert.deepEqual(Object.keys(products[0]), REQUIRED_PRODUCT_COLUMNS);
   const { productCategoryName, ...firstProductWithoutCategoryName } = products[0];
@@ -112,7 +122,45 @@ test('project calculations select glass products by CSV productGroup', () => {
   assert.equal(project.sections.length, 1);
   assert.equal(project.sections[0].result.height, 1000);
   assert.equal(project.sections[0].result.systemDetails.colorName, 'Clear');
+  assert.deepEqual(
+    project.sections[0].result.systemDetails.profileProductCodes,
+    {
+      standardBar: 'R-TM-102-F1-T',
+      customCut: 'R-TM-102-F1-V',
+    },
+  );
   assert.ok(project.sections[0].result.plans[0].combination.length > 0);
+});
+
+test('side-mounted base rail selects its own stock and custom-cut products', () => {
+  const project = calculateProject(
+    {
+      system: 'vonalmenti',
+      railVariant: '117-side',
+      sections: [
+        {
+          number: 1,
+          length: 4000,
+          panes: null,
+          vonalmentiGap: 5,
+          color: 'U1',
+        },
+      ],
+    },
+    products,
+  );
+
+  assert.deepEqual(
+    project.sections[0].result.systemDetails.profileProductCodes,
+    {
+      standardBar: 'R-SM-117-F1-T',
+      customCut: 'R-SM-117-F1-V',
+    },
+  );
+  assert.equal(
+    products.find((product) => product.productCode === 'R-SM-117-F1-V').price,
+    30605,
+  );
 });
 
 test('CSV uses the documented glass and railing product-group codes', () => {

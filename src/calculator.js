@@ -25,6 +25,11 @@ export const VONALMENTI_PROFILE = Object.freeze({
   cutPriceMultiplier: 1.3,
 });
 
+/** Calculate one custom-cut price from its CSV price-per-metre value. */
+export function calculateCustomCutPrice(lengthMillimetres, pricePerMetre) {
+  return lengthMillimetres * (pricePerMetre / 1000);
+}
+
 export const VONALMENTI_COLORS = Object.freeze({
   U1: 'U1 (clear)',
   U2: 'U2 (one-side grey + one-side clear)',
@@ -526,6 +531,17 @@ export function calculatePlans(input, products) {
     target = input.length - seamTotal;
 
     const profileChoice = optimizeProfiles(input.length);
+    const standardBarProduct = railProducts.find((product) =>
+      product.productCode.endsWith('-T'),
+    );
+    const customCutProduct = railProducts.find((product) =>
+      product.productCode.endsWith('-V'),
+    );
+    if (!standardBarProduct || !customCutProduct) {
+      throw new CalculatorError(
+        `Standard-bar and custom-cut products are required for ${railVariant.label}.`,
+      );
+    }
     systemDetails = {
       type: 'vonalmenti',
       railVariant,
@@ -533,6 +549,10 @@ export function calculatePlans(input, products) {
       seamTotal,
       color: input.color,
       profile: profileChoice,
+      profileProductCodes: {
+        standardBar: standardBarProduct.productCode,
+        customCut: customCutProduct.productCode,
+      },
     };
   } else {
     throw new CalculatorError('Select a supported railing system.');

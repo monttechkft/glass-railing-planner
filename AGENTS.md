@@ -152,6 +152,8 @@ odd. The aggregated `958S` BoM quantity is the endpoint total divided by two.
   remain available in the browser tooltip.
 - Post boxes display inventory `productCode` values. Half-Height post layouts
   currently use only the matching `F1` product.
+- Beneath the boxes, every section shows the same ordered component sequence as
+  plain text in the form `| productCode | productCode | ... |`.
 - Glass and post boxes are interleaved for post systems, beginning with a post.
 - Continuous Base-Rail layouts contain glass boxes only.
 - Do not render the old per-section **Profile layout** text below base-rail
@@ -166,18 +168,23 @@ proportional.
 ## Bills of materials
 
 BoM tables are project-level totals aggregated across every active section.
+Prices are displayed in HUF and come from the inventory CSV. A base-rail
+custom-cut (`-V`) product's `price` is its HUF-per-metre rate and is scaled to
+the required cut length. Its BoM quantity is the aggregated length in metres,
+not a count of custom-cut pieces.
 
 ### Glass BoM
 
 - Identifies glass items by the selected inventory `productCode`.
-- Contains Product code, Quantity, and Line total columns.
+- Contains Product code, Quantity, Line total, Unit price, and Total price
+  columns.
 - Base-rail glass colors remain distinct items when grouping inventory.
 
 ### Post BoM
 
 - Shown only for Full-Height and Half-Height systems.
-- Identifies posts by inventory `productCode` and contains only Product code and
-  Quantity columns; do not restore Line total.
+- Identifies posts by inventory `productCode` and contains Product code,
+  Quantity, Unit price, and Total price columns.
 - Appears separately from the Glass BoM.
 - Full-Height Corner Post quantity applies the divide-by-two rule described
   above.
@@ -185,11 +192,11 @@ BoM tables are project-level totals aggregated across every active section.
 ### Base-Rail BoM
 
 - Shown only for the Continuous Base-Rail system.
-- Contains only Rail type and Quantity columns; do not restore Line total.
+- Contains Product code, Quantity, Unit price, and Total price columns.
 - Appears separately from the Glass BoM.
-- The standard bar item is named `<rail variant> (2.5m Bar)`.
-- Custom-cut items are named `<rail variant> (<length> mm Custom Cut)` and are
-  grouped by cut length across sections.
+- The standard bar item uses the selected `-T` inventory product code.
+- Custom cuts use one row with the selected `-V` inventory product code and the
+  aggregated required length in metres as Quantity.
 - The footer label is **Base-Rail total**.
 
 ## UI wording and appearance
