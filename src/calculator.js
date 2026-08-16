@@ -1,3 +1,5 @@
+import { PRODUCT_CATEGORY_CODES } from './inventory.js';
+
 // Shared calculation engine for all three railing systems.
 //
 // All physical measurements are integers in millimetres. This avoids the
@@ -29,6 +31,19 @@ export const VONALMENTI_COLORS = Object.freeze({
   U3: 'U3 (double-sided grey)',
 });
 
+// These values match the productGroup codes in glass_inventory.csv. Keeping
+// them together makes the connection between each railing system and its
+// compatible glass products explicit.
+export const GLASS_PRODUCT_GROUPS = Object.freeze({
+  fullHeight: 'G-U1-850',
+  halfHeight: 'G-U1-900',
+  continuousBase: Object.freeze({
+    U1: 'G-U1-1000',
+    U2: 'G-U2-1000',
+    U3: 'G-U3-1000',
+  }),
+});
+
 // Values are stable internal form identifiers; labels are the text shown in
 // the selector and calculation results.
 export const RAIL_VARIANTS = Object.freeze({
@@ -45,6 +60,17 @@ export const RAIL_VARIANTS = Object.freeze({
     '102-top': '102 mm Top-Mounted',
     '117-side': '117 mm Side-Mounted',
   }),
+});
+
+// Connect each form variant to the railing-component rows in the CSV.
+export const RAIL_VARIANT_PRODUCT_GROUPS = Object.freeze({
+  '958-top': 'R-TM-958',
+  '1000-top': 'R-TM-1000',
+  '1266-side': 'R-SM-1266',
+  '448-top': 'R-TM-448',
+  '628-side': 'R-SM-628',
+  '102-top': 'R-TM-102',
+  '117-side': 'R-SM-117',
 });
 
 /** Error type used for input and no-result messages that can be shown safely. */
@@ -69,18 +95,18 @@ export function autoPanes(total, preferredWidth = DEFAULTS.preferredMaximumWidth
 
 /**
  * Create maximum-width tiers. The search starts at 1100 mm and permits wider
- * inventory sizes only if the narrower stock cannot produce a plan.
+ * product widths only if the narrower glass products cannot produce a plan.
  *
- * @param {{width: number}[]} inventory - Available glass records.
+ * @param {{width: number}[]} glassProducts - Available glass product rows.
  * @param {number} preferredMaximum - First maximum width to try.
  * @returns {number[]} Sorted maximum-width limits.
  */
 export function buildTiers(
-  inventory,
+  glassProducts,
   preferredMaximum = DEFAULTS.preferredMaximumWidth,
 ) {
-  const widerWidths = inventory
-    .map((item) => item.width)
+  const widerWidths = glassProducts
+    .map((product) => product.width)
     .filter((width) => width > preferredMaximum);
 
   return [...new Set([preferredMaximum, ...widerWidths])].sort((a, b) => a - b);
@@ -99,10 +125,10 @@ function countWidths(combination) {
  * Calculate the largest fraction of a recorded stock quantity used by a plan.
  * Like the Python scripts, this ranks plans but does not enforce stock limits.
  */
-function dependencyRatio(combination, stockByWidth) {
+function dependencyRatio(combination, quantityByWidth) {
   const counts = countWidths(combination);
   return Math.max(
-    ...[...counts].map(([width, used]) => used / stockByWidth.get(width)),
+    ...[...counts].map(([width, used]) => used / quantityByWidth.get(width)),
   );
 }
 
@@ -131,7 +157,7 @@ function widthDispersion(combination) {
   return Math.sqrt(variance);
 }
 
-/** Build a flat panel list from parallel inventory-width and count arrays. */
+/** Build a flat panel list from parallel product-width and count arrays. */
 function expandCounts(widths, counts) {
   const combination = [];
   widths.forEach((width, index) => {
@@ -165,17 +191,19 @@ export function findCombinations(
   panelCount,
   tolerance,
   widthCap,
-  inventory,
+  glassProducts,
 ) {
-  const usableStock = inventory
-    .filter((item) => item.width <= widthCap)
+  const usableProducts = glassProducts
+    .filter((product) => product.width <= widthCap)
     .slice()
     .sort((a, b) => a.width - b.width);
 
-  if (usableStock.length === 0 || panelCount <= 0) return [];
+  if (usableProducts.length === 0 || panelCount <= 0) return [];
 
-  const widths = usableStock.map((item) => item.width);
-  const stockByWidth = new Map(inventory.map((item) => [item.width, item.quantity]));
+  const widths = usableProducts.map((product) => product.width);
+  const quantityByWidth = new Map(
+    glassProducts.map((product) => [product.width, product.quantity]),
+  );
   const results = [];
   const lastIndex = widths.length - 1;
   const maximumWidth = widths[lastIndex];
@@ -191,7 +219,7 @@ export function findCombinations(
       combination,
       total,
       undercut,
-      dependencyRatio: dependencyRatio(combination, stockByWidth),
+      dependencyRatio: dependencyRatio(combination, quantityByWidth),
     });
   }
 
@@ -234,9 +262,9 @@ export function findCombinations(
 export function searchWithTolerance({
   target,
   panelCount,
-  inventory,
+  glassProducts,
 }) {
-  const tiers = buildTiers(inventory);
+  const tiers = buildTiers(glassProducts);
 
   // Integer millimetres make this loop include the maximum tolerance exactly.
   for (
@@ -250,7 +278,7 @@ export function searchWithTolerance({
         panelCount,
         tolerance,
         widthCap,
-        inventory,
+        glassProducts,
       );
       if (plans.length > 0) {
         return { widthCap, plans: plans.slice(0, 1), tolerance };
@@ -402,54 +430,90 @@ export function optimizeProfiles(totalLength) {
  * Calculate plans for any supported single-section system.
  *
  * @param {object} input - Normalized form values in integer millimetres.
- * @param {object} inventories - Inventory arrays keyed by glass height.
+ * @param {object[]} products - Product rows parsed from the inventory CSV.
  * @returns {object} Section metadata and ranked plans ready for the UI.
  */
-export function calculatePlans(input, inventories) {
+export function calculatePlans(input, products) {
   validateInput(input);
+  if (!Array.isArray(products)) {
+    throw new CalculatorError('Product data must be loaded from the inventory CSV.');
+  }
 
   const panelCount = input.panes ?? autoPanes(input.length);
   if (panelCount <= 0) {
     throw new CalculatorError('Could not determine a valid number of panels.');
   }
 
-  let glassHeight;
-  let inventoryKey;
+  let height;
+  let productGroup;
   let target;
   let systemDetails;
   const railVariant = resolveRailVariant(input.system, input.railVariant);
+  const railProductGroup = RAIL_VARIANT_PRODUCT_GROUPS[railVariant.key];
+  const railProducts = products.filter(
+    (product) =>
+      product.productCategory === PRODUCT_CATEGORY_CODES.railingComponent &&
+      product.productGroup === railProductGroup,
+  );
 
   if (input.system === '958') {
-    glassHeight = 850;
-    inventoryKey = '850';
+    height = 850;
+    productGroup = GLASS_PRODUCT_GROUPS.fullHeight;
     const posts = postUsage958(panelCount, input.startPost, input.endPost);
+    const postProductCodes = Object.fromEntries(
+      ['I', 'K', 'S'].map((postType) => {
+        const product = railProducts.find((item) =>
+          item.productCode.startsWith(`${railProductGroup}${postType}-`),
+        );
+        if (!product) {
+          throw new CalculatorError(
+            `No ${postType} post product is available for ${railVariant.label}.`,
+          );
+        }
+        return [postType, product.productCode];
+      }),
+    );
     target = input.length - posts.totalWidth;
     systemDetails = {
       type: '958',
       railVariant,
       posts,
+      postProductCodes,
+      postProductCodeSequence: posts.sequence.map(
+        (post) => postProductCodes[post.at(-1)],
+      ),
       postCount: panelCount + 1,
     };
   } else if (input.system === 'general') {
-    glassHeight = 900;
-    inventoryKey = '900';
+    height = 900;
+    productGroup = GLASS_PRODUCT_GROUPS.halfHeight;
     if (!Number.isInteger(input.gap) || input.gap < 0) {
       throw new CalculatorError('Panel gap must be zero or greater.');
     }
     const seamTotal = input.gap * Math.max(panelCount - 1, 0);
     target = input.length - seamTotal;
     const postCount = panelCount + 1;
+    // F1 is currently the chosen post item when a half-height group contains
+    // both F1 and F2 inventory alternatives.
+    const postProduct = railProducts.find((product) =>
+      product.productCode.endsWith('-F1'),
+    );
+    if (!postProduct) {
+      throw new CalculatorError(
+        `No F1 post product is available for ${railVariant.label}.`,
+      );
+    }
     systemDetails = {
       type: 'general',
       railVariant,
       gap: input.gap,
       seamTotal,
-      postLabel: railVariant.label,
       postCount,
-      postSequence: Array(postCount).fill(railVariant.label),
+      postProductCode: postProduct.productCode,
+      postProductCodeSequence: Array(postCount).fill(postProduct.productCode),
     };
   } else if (input.system === 'vonalmenti') {
-    glassHeight = 1000;
+    height = 1000;
     if (!Number.isInteger(input.vonalmentiGap) || input.vonalmentiGap < 0) {
       throw new CalculatorError('Panel gap must be zero or greater.');
     }
@@ -457,7 +521,7 @@ export function calculatePlans(input, inventories) {
       throw new CalculatorError('Select a supported base-rail glass color.');
     }
 
-    inventoryKey = `1000${input.color}`;
+    productGroup = GLASS_PRODUCT_GROUPS.continuousBase[input.color];
     const seamTotal = input.vonalmentiGap * Math.max(panelCount - 1, 0);
     target = input.length - seamTotal;
 
@@ -468,7 +532,6 @@ export function calculatePlans(input, inventories) {
       gap: input.vonalmentiGap,
       seamTotal,
       color: input.color,
-      colorDescription: VONALMENTI_COLORS[input.color],
       profile: profileChoice,
     };
   } else {
@@ -479,15 +542,23 @@ export function calculatePlans(input, inventories) {
     throw new CalculatorError('Posts or gaps occupy too much of the section length.');
   }
 
-  const inventory = inventories[inventoryKey];
-  if (!Array.isArray(inventory) || inventory.length === 0) {
-    throw new CalculatorError(`No inventory is available for ${glassHeight} mm glass.`);
+  const glassProducts = products.filter(
+    (product) =>
+      product.productCategory === PRODUCT_CATEGORY_CODES.glass &&
+      product.productGroup === productGroup,
+  );
+  if (glassProducts.length === 0) {
+    throw new CalculatorError(`No products are available for ${height} mm glass.`);
+  }
+  if (input.system === 'vonalmenti') {
+    // Keep the displayed color name aligned with the editable CSV column.
+    systemDetails.colorName = glassProducts[0].colorName;
   }
 
   const search = searchWithTolerance({
     target,
     panelCount,
-    inventory,
+    glassProducts,
   });
 
   if (search.plans.length === 0) {
@@ -496,20 +567,30 @@ export function calculatePlans(input, inventories) {
     );
   }
 
+  // Widths identify products within the already selected glass product group.
+  // This lookup lets the UI show the exact CSV product code for every panel.
+  const productCodeByWidth = new Map(
+    glassProducts.map((product) => [product.width, product.productCode]),
+  );
+
   return {
     system: input.system,
     sectionLength: input.length,
     panelCount,
-    glassHeight,
+    height,
     railVariant,
     targetGlassLength: target,
     widthCap: search.widthCap,
     tolerance: search.tolerance,
     systemDetails,
-    plans: search.plans.map((plan) => ({
-      ...plan,
-      sequence: prettySequence(plan.combination),
-    })),
+    plans: search.plans.map((plan) => {
+      const sequence = prettySequence(plan.combination);
+      return {
+        ...plan,
+        sequence,
+        productCodeSequence: sequence.map((width) => productCodeByWidth.get(width)),
+      };
+    }),
   };
 }
 
@@ -520,10 +601,10 @@ export function calculatePlans(input, inventories) {
  *
  * @param {object} input - Shared system settings plus up to four sections.
  * @param {object[]} input.sections - Per-section measurements and options.
- * @param {object} inventories - Inventory arrays keyed by glass height/color.
+ * @param {object[]} products - Product rows parsed from the inventory CSV.
  * @returns {object} Calculated sections with their original section numbers.
  */
-export function calculateProject(input, inventories) {
+export function calculateProject(input, products) {
   if (!Array.isArray(input.sections) || input.sections.length === 0) {
     throw new CalculatorError('Enter at least one section.');
   }
@@ -569,7 +650,7 @@ export function calculateProject(input, inventories) {
             system: input.system,
             railVariant: input.railVariant,
           },
-          inventories,
+          products,
         ),
       };
     } catch (error) {

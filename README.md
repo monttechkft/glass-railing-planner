@@ -111,23 +111,63 @@ groups custom cuts by length.
 ## Understanding the results
 
 - Each active section has a separate graphical layout.
+- Each glass box is labelled with the exact `productCode` selected from the
+  inventory CSV. Hovering over a glass box shows its dimensions.
+- Post boxes and the Post Bill of Materials use their selected inventory
+  `productCode`. Half-Height systems currently use the `F1` product.
 - Glass box widths use the same fixed scale in every section, so their displayed
   widths are proportional to the physical panel widths.
 - Long layouts can be scrolled horizontally.
 - The Glass Bill of Materials combines matching glass panels from every active
-  section.
+  section and identifies each item by its inventory `productCode`.
 - The Post or Base-Rail Bill of Materials contains totals for the entire
   project, not separate totals for each section.
 - The planner returns one recommended plan for each active section.
 
 ## Inventory data
 
-The application imports its inventory from `glass_inventory.json`. Inventory
-records are grouped by glass height and, for base-rail glass, by color. Values
-such as `width` are stored in millimetres.
+The application imports its inventory from the Excel-editable
+`glass_inventory.csv` file. The required columns are:
 
-Because the JSON file is included in the Vite build, the application does not
-need an Excel file or a database at runtime.
+- `productCode`
+- `productName`
+- `productCategory`
+- `productCategoryName`
+- `productGroup`
+- `productGroupName`
+- `height`
+- `width`
+- `color`
+- `colorName`
+- `price`
+- `quantity`
+
+The columns may be reordered because the parser uses their header names. Extra
+columns are also allowed and ignored by the application. Keep the required
+names unchanged, and export the edited Excel sheet as UTF-8 CSV with comma
+separators.
+
+The `productCategory` column uses compact codes: `G` for glass and `R` for a
+railing component. The adjacent `productCategoryName` column contains a
+required, freely editable descriptive label; it is not used by calculations.
+
+Glass `productName` values use `<width>x<height>mm Glass Panel - <color name>`,
+for example `900x850mm Glass Panel - Clear`.
+
+Product groups use a structured code:
+
+- Glass: `G-<color>-<height>`, such as `G-U1-850` or `G-U3-1000`.
+- Railing components: `R-<mounting>-<height>`, where `TM` means Top-Mounted
+  and `SM` means Side-Mounted, such as `R-TM-958` or `R-SM-628`.
+
+Glass product codes use `G-<color>-<width>x<height>`, such as
+`G-U1-900x850`.
+
+Railing-component product codes start with their complete product-group code,
+such as `R-TM-958I-F1` or `R-SM-628-F1`.
+
+The CSV is included in the Vite bundle, so the deployed application does not
+need Excel, a database, or a separate runtime data request.
 
 ## Main project files
 
@@ -135,7 +175,8 @@ need an Excel file or a database at runtime.
 - `src/main.js` — form creation, user interaction, result rendering, and BoM
   aggregation
 - `src/calculator.js` — railing calculations and plan selection
+- `src/inventory.js` — CSV parsing, column validation, and product normalization
 - `src/style.css` — interface and layout styling
 - `vite.config.js` — local and GitHub Pages base-path configuration
 - `.github/workflows/deploy-pages.yml` — automatic GitHub Pages deployment
-- `glass_inventory.json` — embedded glass inventory
+- `glass_inventory.csv` — active Excel-editable product inventory

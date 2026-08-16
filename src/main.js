@@ -1,13 +1,21 @@
-import inventoryData from '../glass_inventory.json';
+import productCsvText from '../glass_inventory.csv?raw';
 import {
   calculateProject,
   CalculatorError,
   RAIL_VARIANTS,
 } from './calculator.js';
+import { InventoryCsvError, parseInventoryCsv } from './inventory.js';
 import './style.css';
 
 const SECTION_COUNT = 4;
 const DISABLED_RAIL_VARIANTS = new Set(['1000-top', '1266-side']);
+let products = [];
+let productDataError = null;
+try {
+  products = parseInventoryCsv(productCsvText);
+} catch (error) {
+  productDataError = error;
+}
 let visibleSectionCount = 1;
 
 // Cache the permanent page elements once. Section controls are rebuilt when
@@ -259,19 +267,19 @@ function renderGlassBillOfMaterials(calculatedSections) {
   const counts = new Map();
 
   calculatedSections.forEach(({ result }) => {
-    const color = result.system === 'vonalmenti'
-      ? result.systemDetails.colorDescription
-      : null;
-    result.plans[0].combination.forEach((width) => {
-      const key = `${result.glassHeight}|${width}|${color ?? ''}`;
-      const current = counts.get(key) ?? {
-        height: result.glassHeight,
+    const plan = result.plans[0];
+    // The product-code sequence is aligned with the physical width sequence,
+    // so each BoM row refers to the exact CSV product selected for the layout.
+    plan.productCodeSequence.forEach((productCode, index) => {
+      const width = plan.sequence[index];
+      const current = counts.get(productCode) ?? {
+        productCode,
+        height: result.height,
         width,
-        color,
         quantity: 0,
       };
       current.quantity += 1;
-      counts.set(key, current);
+      counts.set(productCode, current);
     });
   });
 
@@ -279,26 +287,23 @@ function renderGlassBillOfMaterials(calculatedSections) {
     (a, b) =>
       a.height - b.height ||
       a.width - b.width ||
-      String(a.color).localeCompare(String(b.color)),
+      a.productCode.localeCompare(b.productCode),
   );
   const tableWrapper = createElement('div', 'bom-table-wrapper');
   const table = createElement('table', 'bom-table');
   const caption = createElement('caption', null, 'Glass bill of materials');
   const head = document.createElement('thead');
   const headRow = document.createElement('tr');
-  ['Glass dimensions', 'Quantity', 'Line total'].forEach((label) => {
+  ['Product code', 'Quantity', 'Line total'].forEach((label) => {
     headRow.append(createElement('th', null, label));
   });
   head.append(headRow);
 
   const body = document.createElement('tbody');
   items.forEach((item) => {
-    const itemName = item.color
-      ? `${formatGlassDimensions(item.height, item.width)} · ${item.color}`
-      : formatGlassDimensions(item.height, item.width);
     const row = document.createElement('tr');
     row.append(
-      createElement('td', null, itemName),
+      createElement('td', null, item.productCode),
       createElement('td', null, String(item.quantity)),
       createElement('td', null, formatMillimetres(item.width * item.quantity)),
     );
@@ -328,7 +333,7 @@ function renderPostBillOfMaterials(rows) {
   const caption = createElement('caption', null, 'Post bill of materials');
   const head = document.createElement('thead');
   const headRow = document.createElement('tr');
-  ['Post type', 'Quantity'].forEach((label) => {
+  ['Product code', 'Quantity'].forEach((label) => {
     headRow.append(createElement('th', null, label));
   });
   head.append(headRow);
@@ -371,12 +376,13 @@ function renderProjectPostBillOfMaterials(calculatedSections) {
       }),
       { I: 0, K: 0, S: 0 },
     );
+    const productCodes = firstResult.systemDetails.postProductCodes;
     return renderPostBillOfMaterials([
-      { name: '958I', quantity: totals.I },
-      { name: '958K', quantity: totals.K },
+      { name: productCodes.I, quantity: totals.I },
+      { name: productCodes.K, quantity: totals.K },
       // Both adjoining sections include the same physical corner post, so the
       // aggregated endpoint count contains every corner twice.
-      { name: '958S', quantity: totals.S / 2 },
+      { name: productCodes.S, quantity: totals.S / 2 },
     ]);
   }
 
@@ -386,7 +392,7 @@ function renderProjectPostBillOfMaterials(calculatedSections) {
       0,
     );
     return renderPostBillOfMaterials([
-      { name: firstResult.systemDetails.postLabel, quantity },
+      { name: firstResult.systemDetails.postProductCode, quantity },
     ]);
   }
 
@@ -457,13 +463,12 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   return tableWrapper;
 }
 
-/** Create one glass chip labelled with its height and width. */
-function createGlassChip(width, glassHeight) {
-  const chip = createElement(
-    'span',
-    'panel-chip',
-    formatGlassDimensions(glassHeight, width),
-  );
+/** Create one glass chip labelled with its exact inventory product code. */
+function createGlassChip(width, height, productCode) {
+  const chip = createElement('span', 'panel-chip', productCode);
+  // Keep the dimensions available as a browser tooltip even though the
+  // visible label now identifies the corresponding CSV product.
+  chip.title = formatGlassDimensions(height, width);
   // Use one screen pixel for every 5 mm of physical panel width. Applying the
   // same scale to every chip preserves the relative proportions exactly.
   chip.style.setProperty('--glass-box-width', `${width / 5}px`);
@@ -481,24 +486,30 @@ function createPostChip(post) {
  * Render one physical sequence. Post systems alternate post and glass and
  * always begin and end with a post. Base-rail sections contain only glass.
  */
-function renderLayoutSequence(glassSequence, result) {
+function renderLayoutSequence(glassSequence, productCodeSequence, result) {
   const wrapper = createElement('div', 'sequence combined-layout');
 
   if (result.system === 'vonalmenti') {
-    glassSequence.forEach((width) => {
-      wrapper.append(createGlassChip(width, result.glassHeight));
+    glassSequence.forEach((width, index) => {
+      wrapper.append(
+        createGlassChip(width, result.height, productCodeSequence[index]),
+      );
     });
     return wrapper;
   }
 
-  const postSequence = result.system === '958'
-    ? result.systemDetails.posts.sequence
-    : result.systemDetails.postSequence;
+  const postSequence = result.systemDetails.postProductCodeSequence;
 
   postSequence.forEach((post, index) => {
     wrapper.append(createPostChip(post));
     if (index < glassSequence.length) {
-      wrapper.append(createGlassChip(glassSequence[index], result.glassHeight));
+      wrapper.append(
+        createGlassChip(
+          glassSequence[index],
+          result.height,
+          productCodeSequence[index],
+        ),
+      );
     }
   });
   return wrapper;
@@ -516,7 +527,7 @@ function renderSectionLayout(calculatedSection) {
   );
   block.append(
     heading,
-    renderLayoutSequence(plan.sequence, result),
+    renderLayoutSequence(plan.sequence, plan.productCodeSequence, result),
   );
   return block;
 }
@@ -545,8 +556,13 @@ function renderResults(project) {
 
 /** Replace the result area with a readable validation or search error. */
 function renderError(error) {
-  errorMessage.textContent =
-    error instanceof CalculatorError ? error.message : 'An unexpected calculation error occurred.';
+  if (error instanceof CalculatorError) {
+    errorMessage.textContent = error.message;
+  } else if (error instanceof InventoryCsvError) {
+    errorMessage.textContent = `Inventory CSV error: ${error.message}`;
+  } else {
+    errorMessage.textContent = 'An unexpected calculation error occurred.';
+  }
   emptyState.hidden = true;
   resultsContainer.hidden = true;
   errorMessage.hidden = false;
@@ -568,7 +584,8 @@ removeSectionButton.addEventListener('click', () => {
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   try {
-    renderResults(calculateProject(readFormInput(), inventoryData.inventories));
+    if (productDataError) throw productDataError;
+    renderResults(calculateProject(readFormInput(), products));
   } catch (error) {
     renderError(error);
   }

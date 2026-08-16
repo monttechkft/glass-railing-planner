@@ -17,12 +17,12 @@ npm install
 npm run dev
 npm run build
 npm run preview
+npm test
 ```
 
-Run `npm run build` after UI or calculation changes. The `package.json` also
-contains an `npm test` command, but there is currently no test directory in the
-workspace. At minimum, use `node --check src/main.js`,
-`node --check src/calculator.js`, and `npm run build` for verification.
+Run `npm test` and `npm run build` after inventory, UI, or calculation changes.
+Also use `node --check src/main.js`, `node --check src/inventory.js`, and
+`node --check src/calculator.js` for direct syntax verification.
 
 ## Important files
 
@@ -31,8 +31,19 @@ workspace. At minimum, use `node --check src/main.js`,
 - `src/main.js` creates system-specific form fields, reads inputs, renders
   layouts, and aggregates the bills of materials.
 - `src/calculator.js` contains the calculation engine and validation rules.
+- `src/inventory.js` parses and validates the Excel-editable CSV into product
+  objects named after its columns.
 - `src/style.css` contains all application styling.
-- `glass_inventory.json` is the embedded inventory consumed at build/runtime.
+- `glass_inventory.csv` is the active embedded inventory for glass and railing
+  component product records.
+- Its `productGroup` codes use `G-<color>-<height>` for glass and
+  `R-<mounting>-<height>` for railing components (`TM` is Top-Mounted and `SM`
+  is Side-Mounted).
+- `productCategory` uses the compact codes `G` for glass and `R` for railing
+  components; `productCategoryName` stores their readable names.
+- Glass `productName` values use `<width>x<height>mm Glass Panel - <color name>`.
+- `test/inventory.test.js` covers CSV parsing, reordered columns, and a project
+  calculation using parsed product rows.
 - `README.md` contains installation, build, and end-user instructions.
 - `vite.config.js` reads `VITE_BASE_PATH` for GitHub Project Pages builds while
   keeping local development at `/`.
@@ -137,6 +148,10 @@ odd. The aggregated `958S` BoM quantity is the endpoint total divided by two.
 - Every active section is rendered under its **Section N** heading.
 - Do not add a redundant `Layout` subtitle below each Section heading.
 - The undercut badge remains visible for each section.
+- Glass boxes display the selected inventory `productCode`; their dimensions
+  remain available in the browser tooltip.
+- Post boxes display inventory `productCode` values. Half-Height post layouts
+  currently use only the matching `F1` product.
 - Glass and post boxes are interleaved for post systems, beginning with a post.
 - Continuous Base-Rail layouts contain glass boxes only.
 - Do not render the old per-section **Profile layout** text below base-rail
@@ -154,14 +169,15 @@ BoM tables are project-level totals aggregated across every active section.
 
 ### Glass BoM
 
-- Shows glass as `height x width mm`, for example `850 x 900 mm`.
-- Contains Glass dimensions, Quantity, and Line total columns.
+- Identifies glass items by the selected inventory `productCode`.
+- Contains Product code, Quantity, and Line total columns.
 - Base-rail glass colors remain distinct items when grouping inventory.
 
 ### Post BoM
 
 - Shown only for Full-Height and Half-Height systems.
-- Contains only Post type and Quantity columns; do not restore Line total.
+- Identifies posts by inventory `productCode` and contains only Product code and
+  Quantity columns; do not restore Line total.
 - Appears separately from the Glass BoM.
 - Full-Height Corner Post quantity applies the divide-by-two rule described
   above.
