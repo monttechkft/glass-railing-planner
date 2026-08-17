@@ -3,10 +3,11 @@
 ## Project purpose
 
 This repository contains a browser-based glass railing planner built with
-plain HTML, CSS, JavaScript, and Vite. It replaces the behavior that originally
-came from multiple Python calculators. The application must remain easy for
-the owner to read, so preserve useful comments around non-obvious calculations
-and UI-generation code.
+React, TypeScript, CSS, and Vite. Its framework-independent calculation and CSV
+modules remain in JavaScript. It replaces behavior that originally came from
+multiple Python calculators. The application must remain easy for the owner to
+read, so preserve useful comments around non-obvious calculations, state, and
+rendering code.
 
 All user-facing and internal physical measurements are in integer millimetres.
 
@@ -18,19 +19,25 @@ npm run dev
 npm run build
 npm run preview
 npm test
+npm run typecheck
 ```
 
-Run `npm test` and `npm run build` after inventory, UI, or calculation changes.
-Also use `node --check src/main.js`, `node --check src/inventory.js`,
-`node --check src/railingSystems.js`, and `node --check src/calculator.js` for
-direct syntax verification.
+Run `npm run typecheck`, `npm test`, and `npm run build` after inventory, UI, or
+calculation changes. Also use `node --check src/inventory.js`, `node --check
+src/railingSystems.js`, and `node --check src/calculator.js` for direct syntax
+verification of the framework-independent JavaScript modules.
 
 ## Important files
 
-- `index.html` contains the permanent page structure and empty containers for
-  JavaScript-generated controls and results.
-- `src/main.js` creates system-specific form fields, reads inputs, renders
-  layouts, and aggregates the bills of materials.
+- `index.html` contains the minimal document and React root element.
+- `src/main.tsx` mounts the React application.
+- `src/App.tsx` owns planner state and invokes the calculation engine.
+- `src/components/PlannerForm.tsx` renders global and per-section inputs.
+- `src/components/ResultsPanel.tsx` renders layouts and aggregates the bills of
+  materials.
+- `src/data.ts` loads and joins the embedded CSV files once at startup.
+- `src/types.ts` defines the shared CSV, form, and calculation-result contracts.
+- `src/formatters.ts` contains measurement and price display helpers.
 - `src/calculator.js` contains the calculation engine and validation rules.
 - `src/inventory.js` parses product, price, and stock CSV files and joins them
   into calculation-ready product objects using `productCode`.
@@ -38,9 +45,10 @@ direct syntax verification.
   supported calculation-family IDs, and validates product compatibility IDs.
 - `src/style.css` contains all application styling.
 - `data/products.csv` stores stable glass and railing-component definitions.
-- `data/product_prices.csv` stores `priceHuf` and `priceUnit` for every product.
-- `data/product_stock.csv` stores tracked `stockQuantity` values. Glass products
-  must have stock rows; railing components may be omitted.
+- `data/product_prices.csv` repeats `productCode` and `productName` and stores
+  `priceHuf` and `priceUnit` for every product.
+- `data/product_stock.csv` repeats `productCode` and `productName` and stores
+  `stockQuantity`. Every product has a row; untracked railing stock is empty.
 - `data/railing_systems.csv` is the active embedded catalogue for railing-system
   families and variants. Its row order controls the form order, and `enabled`
   controls whether a variant can be selected.
@@ -57,11 +65,13 @@ direct syntax verification.
 - `componentType` supplies the calculation role (`glassPanel`, the individual
   full-height post roles, `multiPositionPost`, `baseRailBar`, or
   `baseRailCustomCut`) so the application does not parse behavior from codes.
-- The three product-data files are joined by exact `productCode`. Unknown,
-  duplicate, and required missing cross-file records are rejected.
+- The three product-data files must contain exactly the same product rows in
+  the same order. Their `productCode` and `productName` cells are validated
+  against `data/products.csv`; duplicate and required missing data is rejected.
 - Only product definitions with `enabled=true` may be selected by calculations.
 - `test/inventory.test.js` covers the three CSV parsers, their validated join,
   reordered columns, and calculations using the joined product rows.
+- `test/ui.test.tsx` covers key React rendering and interaction paths.
 - `README.md` contains installation, build, and end-user instructions.
 - `vite.config.js` reads `VITE_BASE_PATH` for GitHub Project Pages builds while
   keeping local development at `/`.

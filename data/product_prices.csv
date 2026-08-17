@@ -1,89 +1,89 @@
-productCode,priceHuf,priceUnit
-G-H850-W900-U1,15300,piece
-G-H850-W950-U1,16150,piece
-G-H850-W1000-U1,17000,piece
-G-H850-W1050-U1,17850,piece
-G-H850-W1100-U1,18700,piece
-G-H850-W1150-U1,19550,piece
-G-H850-W1200-U1,20400,piece
-G-H850-W1250-U1,21250,piece
-G-H850-W1300-U1,22100,piece
-G-H850-W1500-U1,25500,piece
-G-H900-W850-U1,16150,piece
-G-H900-W900-U1,17100,piece
-G-H900-W950-U1,18050,piece
-G-H900-W1000-U1,19000,piece
-G-H900-W1050-U1,19950,piece
-G-H900-W1100-U1,20900,piece
-G-H900-W1150-U1,21850,piece
-G-H900-W1200-U1,22800,piece
-G-H900-W1500-U1,28500,piece
-G-H1000-W400-U1,13200,piece
-G-H1000-W500-U1,16500,piece
-G-H1000-W600-U1,19800,piece
-G-H1000-W700-U1,23100,piece
-G-H1000-W800-U1,26400,piece
-G-H1000-W850-U1,28050,piece
-G-H1000-W900-U1,29700,piece
-G-H1000-W950-U1,31350,piece
-G-H1000-W1000-U1,33000,piece
-G-H1000-W1050-U1,34650,piece
-G-H1000-W1100-U1,36300,piece
-G-H1000-W1150-U1,37950,piece
-G-H1000-W1200-U1,39600,piece
-G-H1000-W1250-U1,41250,piece
-G-H1000-W1300-U1,42900,piece
-G-H1000-W1350-U1,44550,piece
-G-H1000-W1400-U1,46200,piece
-G-H1000-W1450-U1,47850,piece
-G-H1000-W1500-U1,49500,piece
-G-H1000-W400-U2,13520,piece
-G-H1000-W500-U2,16900,piece
-G-H1000-W600-U2,20280,piece
-G-H1000-W700-U2,23660,piece
-G-H1000-W800-U2,27040,piece
-G-H1000-W850-U2,28730,piece
-G-H1000-W900-U2,30420,piece
-G-H1000-W950-U2,32110,piece
-G-H1000-W1000-U2,33800,piece
-G-H1000-W1050-U2,35490,piece
-G-H1000-W1100-U2,37180,piece
-G-H1000-W1150-U2,38780,piece
-G-H1000-W1200-U2,40560,piece
-G-H1000-W1250-U2,42250,piece
-G-H1000-W1300-U2,43940,piece
-G-H1000-W1400-U2,47320,piece
-G-H1000-W1500-U2,50700,piece
-G-H1000-W400-U3,13520,piece
-G-H1000-W500-U3,16900,piece
-G-H1000-W600-U3,20280,piece
-G-H1000-W700-U3,23660,piece
-G-H1000-W800-U3,27040,piece
-G-H1000-W850-U3,28730,piece
-G-H1000-W900-U3,30420,piece
-G-H1000-W950-U3,32110,piece
-G-H1000-W1000-U3,33800,piece
-G-H1000-W1050-U3,35490,piece
-G-H1000-W1100-U3,37180,piece
-G-H1000-W1150-U3,38870,piece
-G-H1000-W1200-U3,40560,piece
-G-H1000-W1250-U3,42250,piece
-G-H1000-W1300-U3,43940,piece
-G-H1000-W1350-U3,45630,piece
-G-H1000-W1400-U3,47320,piece
-G-H1000-W1450-U3,49010,piece
-G-H1000-W1500-U3,50700,piece
-R-FP-958-TM-END-F1,16000,piece
-R-FP-958-TM-MID-F1,16000,piece
-R-FP-958-TM-COR-F1,20000,piece
-R-FP-1000-TM-END-F1,21000,piece
-R-FP-1000-TM-MID-F1,21000,piece
-R-FP-1000-TM-COR-F1,25000,piece
-R-HP-448-TM-F1,15000,piece
-R-HP-448-TM-F2,17000,piece
-R-HP-628-SM-F1,19000,piece
-R-HP-628-SM-F2,21000,piece
-R-UC-102-TM-F1,58750,piece
-R-UC-102-TM-CUT-F1,30550,metre
-R-UC-117-SM-F1,64625,piece
-R-UC-117-SM-CUT-F1,30605,metre
+productCode,productName,priceHuf,priceUnit
+G-H850-W900-U1,900 x 850 mm Clear Glass Panel,15300,piece
+G-H850-W950-U1,950 x 850 mm Clear Glass Panel,16150,piece
+G-H850-W1000-U1,1000 x 850 mm Clear Glass Panel,17000,piece
+G-H850-W1050-U1,1050 x 850 mm Clear Glass Panel,17850,piece
+G-H850-W1100-U1,1100 x 850 mm Clear Glass Panel,18700,piece
+G-H850-W1150-U1,1150 x 850 mm Clear Glass Panel,19550,piece
+G-H850-W1200-U1,1200 x 850 mm Clear Glass Panel,20400,piece
+G-H850-W1250-U1,1250 x 850 mm Clear Glass Panel,21250,piece
+G-H850-W1300-U1,1300 x 850 mm Clear Glass Panel,22100,piece
+G-H850-W1500-U1,1500 x 850 mm Clear Glass Panel,25500,piece
+G-H900-W850-U1,850 x 900 mm Clear Glass Panel,16150,piece
+G-H900-W900-U1,900 x 900 mm Clear Glass Panel,17100,piece
+G-H900-W950-U1,950 x 900 mm Clear Glass Panel,18050,piece
+G-H900-W1000-U1,1000 x 900 mm Clear Glass Panel,19000,piece
+G-H900-W1050-U1,1050 x 900 mm Clear Glass Panel,19950,piece
+G-H900-W1100-U1,1100 x 900 mm Clear Glass Panel,20900,piece
+G-H900-W1150-U1,1150 x 900 mm Clear Glass Panel,21850,piece
+G-H900-W1200-U1,1200 x 900 mm Clear Glass Panel,22800,piece
+G-H900-W1500-U1,1500 x 900 mm Clear Glass Panel,28500,piece
+G-H1000-W400-U1,400 x 1000 mm Clear Glass Panel,13200,piece
+G-H1000-W500-U1,500 x 1000 mm Clear Glass Panel,16500,piece
+G-H1000-W600-U1,600 x 1000 mm Clear Glass Panel,19800,piece
+G-H1000-W700-U1,700 x 1000 mm Clear Glass Panel,23100,piece
+G-H1000-W800-U1,800 x 1000 mm Clear Glass Panel,26400,piece
+G-H1000-W850-U1,850 x 1000 mm Clear Glass Panel,28050,piece
+G-H1000-W900-U1,900 x 1000 mm Clear Glass Panel,29700,piece
+G-H1000-W950-U1,950 x 1000 mm Clear Glass Panel,31350,piece
+G-H1000-W1000-U1,1000 x 1000 mm Clear Glass Panel,33000,piece
+G-H1000-W1050-U1,1050 x 1000 mm Clear Glass Panel,34650,piece
+G-H1000-W1100-U1,1100 x 1000 mm Clear Glass Panel,36300,piece
+G-H1000-W1150-U1,1150 x 1000 mm Clear Glass Panel,37950,piece
+G-H1000-W1200-U1,1200 x 1000 mm Clear Glass Panel,39600,piece
+G-H1000-W1250-U1,1250 x 1000 mm Clear Glass Panel,41250,piece
+G-H1000-W1300-U1,1300 x 1000 mm Clear Glass Panel,42900,piece
+G-H1000-W1350-U1,1350 x 1000 mm Clear Glass Panel,44550,piece
+G-H1000-W1400-U1,1400 x 1000 mm Clear Glass Panel,46200,piece
+G-H1000-W1450-U1,1450 x 1000 mm Clear Glass Panel,47850,piece
+G-H1000-W1500-U1,1500 x 1000 mm Clear Glass Panel,49500,piece
+G-H1000-W400-U2,400 x 1000 mm Grey / Clear Glass Panel,13520,piece
+G-H1000-W500-U2,500 x 1000 mm Grey / Clear Glass Panel,16900,piece
+G-H1000-W600-U2,600 x 1000 mm Grey / Clear Glass Panel,20280,piece
+G-H1000-W700-U2,700 x 1000 mm Grey / Clear Glass Panel,23660,piece
+G-H1000-W800-U2,800 x 1000 mm Grey / Clear Glass Panel,27040,piece
+G-H1000-W850-U2,850 x 1000 mm Grey / Clear Glass Panel,28730,piece
+G-H1000-W900-U2,900 x 1000 mm Grey / Clear Glass Panel,30420,piece
+G-H1000-W950-U2,950 x 1000 mm Grey / Clear Glass Panel,32110,piece
+G-H1000-W1000-U2,1000 x 1000 mm Grey / Clear Glass Panel,33800,piece
+G-H1000-W1050-U2,1050 x 1000 mm Grey / Clear Glass Panel,35490,piece
+G-H1000-W1100-U2,1100 x 1000 mm Grey / Clear Glass Panel,37180,piece
+G-H1000-W1150-U2,1150 x 1000 mm Grey / Clear Glass Panel,38780,piece
+G-H1000-W1200-U2,1200 x 1000 mm Grey / Clear Glass Panel,40560,piece
+G-H1000-W1250-U2,1250 x 1000 mm Grey / Clear Glass Panel,42250,piece
+G-H1000-W1300-U2,1300 x 1000 mm Grey / Clear Glass Panel,43940,piece
+G-H1000-W1400-U2,1400 x 1000 mm Grey / Clear Glass Panel,47320,piece
+G-H1000-W1500-U2,1500 x 1000 mm Grey / Clear Glass Panel,50700,piece
+G-H1000-W400-U3,400 x 1000 mm Double Grey Glass Panel,13520,piece
+G-H1000-W500-U3,500 x 1000 mm Double Grey Glass Panel,16900,piece
+G-H1000-W600-U3,600 x 1000 mm Double Grey Glass Panel,20280,piece
+G-H1000-W700-U3,700 x 1000 mm Double Grey Glass Panel,23660,piece
+G-H1000-W800-U3,800 x 1000 mm Double Grey Glass Panel,27040,piece
+G-H1000-W850-U3,850 x 1000 mm Double Grey Glass Panel,28730,piece
+G-H1000-W900-U3,900 x 1000 mm Double Grey Glass Panel,30420,piece
+G-H1000-W950-U3,950 x 1000 mm Double Grey Glass Panel,32110,piece
+G-H1000-W1000-U3,1000 x 1000 mm Double Grey Glass Panel,33800,piece
+G-H1000-W1050-U3,1050 x 1000 mm Double Grey Glass Panel,35490,piece
+G-H1000-W1100-U3,1100 x 1000 mm Double Grey Glass Panel,37180,piece
+G-H1000-W1150-U3,1150 x 1000 mm Double Grey Glass Panel,38870,piece
+G-H1000-W1200-U3,1200 x 1000 mm Double Grey Glass Panel,40560,piece
+G-H1000-W1250-U3,1250 x 1000 mm Double Grey Glass Panel,42250,piece
+G-H1000-W1300-U3,1300 x 1000 mm Double Grey Glass Panel,43940,piece
+G-H1000-W1350-U3,1350 x 1000 mm Double Grey Glass Panel,45630,piece
+G-H1000-W1400-U3,1400 x 1000 mm Double Grey Glass Panel,47320,piece
+G-H1000-W1450-U3,1450 x 1000 mm Double Grey Glass Panel,49010,piece
+G-H1000-W1500-U3,1500 x 1000 mm Double Grey Glass Panel,50700,piece
+R-FP-958-TM-END-F1,958 mm Top-Mounted End Post (Finish F1),16000,piece
+R-FP-958-TM-MID-F1,958 mm Top-Mounted Intermediate Post (Finish F1),16000,piece
+R-FP-958-TM-COR-F1,958 mm Top-Mounted Corner Post (Finish F1),20000,piece
+R-FP-1000-TM-END-F1,1000 mm Top-Mounted End Post for Post-and-Top-Rail System (Finish F1),21000,piece
+R-FP-1000-TM-MID-F1,1000 mm Top-Mounted Intermediate Post for Post-and-Top-Rail System (Finish F1),21000,piece
+R-FP-1000-TM-COR-F1,1000 mm Top-Mounted Corner Post for Post-and-Top-Rail System (Finish F1),25000,piece
+R-HP-448-TM-F1,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F1),15000,piece
+R-HP-448-TM-F2,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F2),17000,piece
+R-HP-628-SM-F1,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F1),19000,piece
+R-HP-628-SM-F2,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F2),21000,piece
+R-UC-102-TM-F1,102 mm Top-Mounted U-Channel - 2500 mm Standard Length (Finish F1),58750,piece
+R-UC-102-TM-CUT-F1,102 mm Top-Mounted U-Channel - Custom Cut (Finish F1),30550,metre
+R-UC-117-SM-F1,117 mm Side-Mounted U-Channel - 2500 mm Standard Length (Finish F1),64625,piece
+R-UC-117-SM-CUT-F1,117 mm Side-Mounted U-Channel - Custom Cut (Finish F1),30605,metre

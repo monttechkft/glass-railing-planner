@@ -19,7 +19,8 @@ From the project directory, run:
 npm install
 ```
 
-This installs Vite, which is used to serve and compile the application.
+This installs React, TypeScript, Vite, and the test tooling used by the
+application.
 
 ## Run the application locally
 
@@ -51,6 +52,20 @@ npm run preview
 ```
 
 Open the local address printed by Vite.
+
+## Check and test the application
+
+Check the React and TypeScript source without producing build files:
+
+```bash
+npm run typecheck
+```
+
+Run both the calculation/data tests and the React interface tests:
+
+```bash
+npm test
+```
 
 ## GitHub Pages deployment
 
@@ -155,20 +170,23 @@ come from the Excel-editable `data/products.csv` file. Its required columns are:
 - `enabled`
 
 Prices come from `data/product_prices.csv`, whose required columns are
-`productCode`, `priceHuf`, and `priceUnit`. Every defined product must have one
-price row. Use `piece` for products sold individually and `metre` for
+`productCode`, `productName`, `priceHuf`, and `priceUnit`. Every defined product
+has one price row. Use `piece` for products sold individually and `metre` for
 base-rail custom cuts.
 
 Tracked stock comes from `data/product_stock.csv`, whose required columns are
-`productCode` and `stockQuantity`. Every glass product must have one stock row
-because stock availability affects plan ranking. Railing components may be
-omitted when their stock is not tracked.
+`productCode`, `productName`, and `stockQuantity`. Every product has one stock
+row because the sheets deliberately use the same row order. Glass quantities
+are required because they affect plan ranking; an untracked railing-component
+quantity remains an empty cell.
 
-All three files are joined by the exact, case-sensitive `productCode`. Duplicate
-codes, unknown references, missing prices, and missing glass-stock records are
-reported as data errors. Columns may be reordered because each parser uses
-header names. Extra columns are allowed and ignored. Keep the required names
-unchanged, and export edited Excel sheets as UTF-8 CSV with comma separators.
+All three files must contain exactly the same products in the same order. Both
+`productCode` and `productName` are repeated so rows remain recognizable in
+Excel. The application verifies the row count, order, codes, and names before
+joining data. Columns may be reordered because each parser uses header names,
+but rows may not be reordered independently. Extra columns are allowed and
+ignored. Keep the required names unchanged, and export edited Excel sheets as
+UTF-8 CSV with comma separators.
 
 The `categoryCode` column uses compact codes: `G` for glass and `R` for a
 railing component. The adjacent `categoryName` column contains a required,
@@ -235,15 +253,21 @@ time.
 
 ## Main project files
 
-- `index.html` — page structure and form containers
-- `src/main.js` — form creation, user interaction, result rendering, and BoM
-  aggregation
+- `index.html` — minimal HTML document containing the React root element
+- `src/main.tsx` — React entry point
+- `src/App.tsx` — planner state, calculation submission, and component wiring
+- `src/components/PlannerForm.tsx` — system-specific form and section controls
+- `src/components/ResultsPanel.tsx` — layouts and aggregated BoM tables
+- `src/data.ts` — one-time CSV loading and validated data joining
+- `src/types.ts` — shared product, form, and calculation result contracts
+- `src/formatters.ts` — measurement and price display helpers
 - `src/calculator.js` — railing calculations and plan selection
 - `src/inventory.js` — product, price, and stock CSV parsing and validated joins
 - `src/railingSystems.js` — railing-system catalogue parsing and validation
 - `src/style.css` — interface and layout styling
 - `vite.config.js` — local and GitHub Pages base-path configuration
 - `.github/workflows/deploy-pages.yml` — automatic GitHub Pages deployment
+- `test/ui.test.tsx` — React interaction and rendering tests
 - `data/products.csv` — stable Excel-editable product definitions
 - `data/product_prices.csv` — prices and sales units keyed by product code
 - `data/product_stock.csv` — tracked stock quantities keyed by product code

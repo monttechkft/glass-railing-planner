@@ -19,6 +19,7 @@ export const REQUIRED_PRODUCT_COLUMNS = Object.freeze([
 /** Commercial price columns read from data/product_prices.csv. */
 export const REQUIRED_PRICE_COLUMNS = Object.freeze([
   'productCode',
+  'productName',
   'priceHuf',
   'priceUnit',
 ]);
@@ -26,6 +27,7 @@ export const REQUIRED_PRICE_COLUMNS = Object.freeze([
 /** Stock columns read from data/product_stock.csv. */
 export const REQUIRED_STOCK_COLUMNS = Object.freeze([
   'productCode',
+  'productName',
   'stockQuantity',
 ]);
 
@@ -313,6 +315,7 @@ export function parseProductPricesCsv(csvText) {
   const prices = records.map(({ values, rowNumber }) => {
     const price = {
       productCode: values.productCode,
+      productName: values.productName,
       priceHuf: readOptionalInteger(
         values.priceHuf,
         'priceHuf',
@@ -322,6 +325,7 @@ export function parseProductPricesCsv(csvText) {
       priceUnit: values.priceUnit,
     };
     requireValue(price, 'productCode', rowNumber, 'Prices');
+    requireValue(price, 'productName', rowNumber, 'Prices');
     requireValue(price, 'priceHuf', rowNumber, 'Prices');
     requireValue(price, 'priceUnit', rowNumber, 'Prices');
     if (price.priceHuf < 0) {
@@ -342,6 +346,7 @@ export function parseProductStockCsv(csvText) {
   const stockRecords = records.map(({ values, rowNumber }) => {
     const stock = {
       productCode: values.productCode,
+      productName: values.productName,
       stockQuantity: readOptionalInteger(
         values.stockQuantity,
         'stockQuantity',
@@ -350,8 +355,8 @@ export function parseProductStockCsv(csvText) {
       ),
     };
     requireValue(stock, 'productCode', rowNumber, 'Stock');
-    requireValue(stock, 'stockQuantity', rowNumber, 'Stock');
-    if (stock.stockQuantity < 0) {
+    requireValue(stock, 'productName', rowNumber, 'Stock');
+    if (stock.stockQuantity !== null && stock.stockQuantity < 0) {
       throw new InventoryCsvError(
         `Stock row ${rowNumber}: stockQuantity cannot be negative.`,
       );
@@ -364,14 +369,41 @@ export function parseProductStockCsv(csvText) {
 }
 
 /**
+ * Commercial sheets deliberately mirror products.csv row for row. Validate
+ * both identifying columns so editors can safely copy aligned Excel ranges.
+ */
+function validateAlignedProductRows(products, records, fileLabel) {
+  if (records.length !== products.length) {
+    throw new InventoryCsvError(
+      `The ${fileLabel} CSV must contain exactly ${products.length} product rows in products.csv order; found ${records.length}.`,
+    );
+  }
+
+  records.forEach((record, index) => {
+    const product = products[index];
+    const dataRow = index + 2;
+    if (record.productCode !== product.productCode) {
+      throw new InventoryCsvError(
+        `${fileLabel} row ${dataRow}: expected productCode "${product.productCode}" to match products.csv order, but found "${record.productCode}".`,
+      );
+    }
+    if (record.productName !== product.productName) {
+      throw new InventoryCsvError(
+        `${fileLabel} row ${dataRow}: productName must match products.csv for "${product.productCode}".`,
+      );
+    }
+  });
+}
+
+/**
  * Join technical definitions, prices, and stock using the stable productCode.
  * The calculator still receives one convenient product object, while each CSV
  * can be maintained independently by its owning data source.
  */
 export function mergeProductData(products, prices, stockRecords) {
-  const productsByCode = new Map(
-    products.map((product) => [product.productCode, product]),
-  );
+  validateAlignedProductRows(products, prices, 'Prices');
+  validateAlignedProductRows(products, stockRecords, 'Stock');
+
   const pricesByCode = new Map(
     prices.map((price) => [price.productCode, price]),
   );
@@ -379,37 +411,11 @@ export function mergeProductData(products, prices, stockRecords) {
     stockRecords.map((stock) => [stock.productCode, stock]),
   );
 
-  const unknownPriceCodes = prices
-    .map((price) => price.productCode)
-    .filter((productCode) => !productsByCode.has(productCode));
-  const unknownStockCodes = stockRecords
-    .map((stock) => stock.productCode)
-    .filter((productCode) => !productsByCode.has(productCode));
-  if (unknownPriceCodes.length > 0) {
-    throw new InventoryCsvError(
-      `The prices CSV references unknown product codes: ${unknownPriceCodes.join(', ')}.`,
-    );
-  }
-  if (unknownStockCodes.length > 0) {
-    throw new InventoryCsvError(
-      `The stock CSV references unknown product codes: ${unknownStockCodes.join(', ')}.`,
-    );
-  }
-
-  const missingPriceCodes = products
-    .map((product) => product.productCode)
-    .filter((productCode) => !pricesByCode.has(productCode));
-  if (missingPriceCodes.length > 0) {
-    throw new InventoryCsvError(
-      `The prices CSV is missing product codes: ${missingPriceCodes.join(', ')}.`,
-    );
-  }
-
   const missingGlassStockCodes = products
     .filter(
       (product) =>
         product.categoryCode === PRODUCT_CATEGORY_CODES.glass &&
-        !stockByCode.has(product.productCode),
+        stockByCode.get(product.productCode)?.stockQuantity === null,
     )
     .map((product) => product.productCode);
   if (missingGlassStockCodes.length > 0) {

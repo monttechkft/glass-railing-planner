@@ -58,7 +58,7 @@ test('custom base-rail cuts scale their CSV price-per-metre by length', () => {
 test('separate CSV files preserve and join all product data', () => {
   assert.equal(productDefinitions.length, 88);
   assert.equal(productPrices.length, 88);
-  assert.equal(productStock.length, 74);
+  assert.equal(productStock.length, 88);
   assert.equal(products.length, 88);
   assert.equal(
     products.filter(
@@ -76,6 +76,26 @@ test('separate CSV files preserve and join all product data', () => {
   assert.deepEqual(Object.keys(productDefinitions[0]), REQUIRED_PRODUCT_COLUMNS);
   assert.deepEqual(Object.keys(productPrices[0]), REQUIRED_PRICE_COLUMNS);
   assert.deepEqual(Object.keys(productStock[0]), REQUIRED_STOCK_COLUMNS);
+  assert.deepEqual(
+    productPrices.map(({ productCode, productName }) => ({
+      productCode,
+      productName,
+    })),
+    productDefinitions.map(({ productCode, productName }) => ({
+      productCode,
+      productName,
+    })),
+  );
+  assert.deepEqual(
+    productStock.map(({ productCode, productName }) => ({
+      productCode,
+      productName,
+    })),
+    productDefinitions.map(({ productCode, productName }) => ({
+      productCode,
+      productName,
+    })),
+  );
   assert.deepEqual(products[0], {
     productCode: 'G-H850-W900-U1',
     productName: '900 x 850 mm Clear Glass Panel',
@@ -422,12 +442,12 @@ test('separate CSV parsers resolve values after columns are reordered', () => {
     '900,G-H850,G,G-H850-W900-U1,Custom group name,850,U1,Clear,Custom category name,Custom product name,FP-958-TM,glassPanel,900,true',
   ].join('\n');
   const reorderedPricesCsv = [
-    'priceUnit,productCode,priceHuf',
-    'piece,G-H850-W900-U1,15300',
+    'priceUnit,productName,productCode,priceHuf',
+    'piece,Custom product name,G-H850-W900-U1,15300',
   ].join('\n');
   const reorderedStockCsv = [
-    'stockQuantity,productCode',
-    '4,G-H850-W900-U1',
+    'stockQuantity,productName,productCode',
+    '4,Custom product name,G-H850-W900-U1',
   ].join('\n');
 
   assert.deepEqual(
@@ -470,14 +490,31 @@ test('products CSV parser rejects invalid enabled flags', () => {
   );
 });
 
-test('joined data rejects unknown commercial product codes', () => {
+test('joined data rejects rows outside products.csv order', () => {
+  const misorderedPrices = productPrices.slice();
+  [misorderedPrices[0], misorderedPrices[1]] = [
+    misorderedPrices[1],
+    misorderedPrices[0],
+  ];
+
   assert.throws(
     () =>
       mergeProductData(
         productDefinitions,
-        [...productPrices, { productCode: 'UNKNOWN', priceHuf: 1, priceUnit: 'piece' }],
+        misorderedPrices,
         productStock,
       ),
-    /prices CSV references unknown product codes: UNKNOWN/,
+    /expected productCode .* to match products.csv order/,
+  );
+});
+
+test('joined data rejects copied rows with mismatched product names', () => {
+  const renamedStock = productStock.map((row, index) =>
+    index === 0 ? { ...row, productName: 'Wrong product' } : row,
+  );
+
+  assert.throws(
+    () => mergeProductData(productDefinitions, productPrices, renamedStock),
+    /productName must match products.csv/,
   );
 });

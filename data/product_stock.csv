@@ -1,75 +1,89 @@
-productCode,stockQuantity
-G-H850-W900-U1,139
-G-H850-W950-U1,142
-G-H850-W1000-U1,42
-G-H850-W1050-U1,60
-G-H850-W1100-U1,20
-G-H850-W1150-U1,80
-G-H850-W1200-U1,108
-G-H850-W1250-U1,22
-G-H850-W1300-U1,75
-G-H850-W1500-U1,86
-G-H900-W850-U1,127
-G-H900-W900-U1,105
-G-H900-W950-U1,103
-G-H900-W1000-U1,164
-G-H900-W1050-U1,73
-G-H900-W1100-U1,851
-G-H900-W1150-U1,78
-G-H900-W1200-U1,148
-G-H900-W1500-U1,33
-G-H1000-W400-U1,42
-G-H1000-W500-U1,27
-G-H1000-W600-U1,23
-G-H1000-W700-U1,37
-G-H1000-W800-U1,59
-G-H1000-W850-U1,45
-G-H1000-W900-U1,44
-G-H1000-W950-U1,65
-G-H1000-W1000-U1,84
-G-H1000-W1050-U1,71
-G-H1000-W1100-U1,36
-G-H1000-W1150-U1,72
-G-H1000-W1200-U1,65
-G-H1000-W1250-U1,48
-G-H1000-W1300-U1,27
-G-H1000-W1350-U1,6
-G-H1000-W1400-U1,22
-G-H1000-W1450-U1,7
-G-H1000-W1500-U1,19
-G-H1000-W400-U2,21
-G-H1000-W500-U2,24
-G-H1000-W600-U2,25
-G-H1000-W700-U2,22
-G-H1000-W800-U2,12
-G-H1000-W850-U2,3
-G-H1000-W900-U2,3
-G-H1000-W950-U2,1
-G-H1000-W1000-U2,3
-G-H1000-W1050-U2,6
-G-H1000-W1100-U2,0
-G-H1000-W1150-U2,2
-G-H1000-W1200-U2,18
-G-H1000-W1250-U2,3
-G-H1000-W1300-U2,0
-G-H1000-W1400-U2,5
-G-H1000-W1500-U2,21
-G-H1000-W400-U3,21
-G-H1000-W500-U3,24
-G-H1000-W600-U3,21
-G-H1000-W700-U3,19
-G-H1000-W800-U3,39
-G-H1000-W850-U3,41
-G-H1000-W900-U3,44
-G-H1000-W950-U3,50
-G-H1000-W1000-U3,57
-G-H1000-W1050-U3,55
-G-H1000-W1100-U3,33
-G-H1000-W1150-U3,42
-G-H1000-W1200-U3,44
-G-H1000-W1250-U3,46
-G-H1000-W1300-U3,15
-G-H1000-W1350-U3,25
-G-H1000-W1400-U3,23
-G-H1000-W1450-U3,22
-G-H1000-W1500-U3,24
+productCode,productName,stockQuantity
+G-H850-W900-U1,900 x 850 mm Clear Glass Panel,139
+G-H850-W950-U1,950 x 850 mm Clear Glass Panel,142
+G-H850-W1000-U1,1000 x 850 mm Clear Glass Panel,42
+G-H850-W1050-U1,1050 x 850 mm Clear Glass Panel,60
+G-H850-W1100-U1,1100 x 850 mm Clear Glass Panel,20
+G-H850-W1150-U1,1150 x 850 mm Clear Glass Panel,80
+G-H850-W1200-U1,1200 x 850 mm Clear Glass Panel,108
+G-H850-W1250-U1,1250 x 850 mm Clear Glass Panel,22
+G-H850-W1300-U1,1300 x 850 mm Clear Glass Panel,75
+G-H850-W1500-U1,1500 x 850 mm Clear Glass Panel,86
+G-H900-W850-U1,850 x 900 mm Clear Glass Panel,127
+G-H900-W900-U1,900 x 900 mm Clear Glass Panel,105
+G-H900-W950-U1,950 x 900 mm Clear Glass Panel,103
+G-H900-W1000-U1,1000 x 900 mm Clear Glass Panel,164
+G-H900-W1050-U1,1050 x 900 mm Clear Glass Panel,73
+G-H900-W1100-U1,1100 x 900 mm Clear Glass Panel,851
+G-H900-W1150-U1,1150 x 900 mm Clear Glass Panel,78
+G-H900-W1200-U1,1200 x 900 mm Clear Glass Panel,148
+G-H900-W1500-U1,1500 x 900 mm Clear Glass Panel,33
+G-H1000-W400-U1,400 x 1000 mm Clear Glass Panel,42
+G-H1000-W500-U1,500 x 1000 mm Clear Glass Panel,27
+G-H1000-W600-U1,600 x 1000 mm Clear Glass Panel,23
+G-H1000-W700-U1,700 x 1000 mm Clear Glass Panel,37
+G-H1000-W800-U1,800 x 1000 mm Clear Glass Panel,59
+G-H1000-W850-U1,850 x 1000 mm Clear Glass Panel,45
+G-H1000-W900-U1,900 x 1000 mm Clear Glass Panel,44
+G-H1000-W950-U1,950 x 1000 mm Clear Glass Panel,65
+G-H1000-W1000-U1,1000 x 1000 mm Clear Glass Panel,84
+G-H1000-W1050-U1,1050 x 1000 mm Clear Glass Panel,71
+G-H1000-W1100-U1,1100 x 1000 mm Clear Glass Panel,36
+G-H1000-W1150-U1,1150 x 1000 mm Clear Glass Panel,72
+G-H1000-W1200-U1,1200 x 1000 mm Clear Glass Panel,65
+G-H1000-W1250-U1,1250 x 1000 mm Clear Glass Panel,48
+G-H1000-W1300-U1,1300 x 1000 mm Clear Glass Panel,27
+G-H1000-W1350-U1,1350 x 1000 mm Clear Glass Panel,6
+G-H1000-W1400-U1,1400 x 1000 mm Clear Glass Panel,22
+G-H1000-W1450-U1,1450 x 1000 mm Clear Glass Panel,7
+G-H1000-W1500-U1,1500 x 1000 mm Clear Glass Panel,19
+G-H1000-W400-U2,400 x 1000 mm Grey / Clear Glass Panel,21
+G-H1000-W500-U2,500 x 1000 mm Grey / Clear Glass Panel,24
+G-H1000-W600-U2,600 x 1000 mm Grey / Clear Glass Panel,25
+G-H1000-W700-U2,700 x 1000 mm Grey / Clear Glass Panel,22
+G-H1000-W800-U2,800 x 1000 mm Grey / Clear Glass Panel,12
+G-H1000-W850-U2,850 x 1000 mm Grey / Clear Glass Panel,3
+G-H1000-W900-U2,900 x 1000 mm Grey / Clear Glass Panel,3
+G-H1000-W950-U2,950 x 1000 mm Grey / Clear Glass Panel,1
+G-H1000-W1000-U2,1000 x 1000 mm Grey / Clear Glass Panel,3
+G-H1000-W1050-U2,1050 x 1000 mm Grey / Clear Glass Panel,6
+G-H1000-W1100-U2,1100 x 1000 mm Grey / Clear Glass Panel,0
+G-H1000-W1150-U2,1150 x 1000 mm Grey / Clear Glass Panel,2
+G-H1000-W1200-U2,1200 x 1000 mm Grey / Clear Glass Panel,18
+G-H1000-W1250-U2,1250 x 1000 mm Grey / Clear Glass Panel,3
+G-H1000-W1300-U2,1300 x 1000 mm Grey / Clear Glass Panel,0
+G-H1000-W1400-U2,1400 x 1000 mm Grey / Clear Glass Panel,5
+G-H1000-W1500-U2,1500 x 1000 mm Grey / Clear Glass Panel,21
+G-H1000-W400-U3,400 x 1000 mm Double Grey Glass Panel,21
+G-H1000-W500-U3,500 x 1000 mm Double Grey Glass Panel,24
+G-H1000-W600-U3,600 x 1000 mm Double Grey Glass Panel,21
+G-H1000-W700-U3,700 x 1000 mm Double Grey Glass Panel,19
+G-H1000-W800-U3,800 x 1000 mm Double Grey Glass Panel,39
+G-H1000-W850-U3,850 x 1000 mm Double Grey Glass Panel,41
+G-H1000-W900-U3,900 x 1000 mm Double Grey Glass Panel,44
+G-H1000-W950-U3,950 x 1000 mm Double Grey Glass Panel,50
+G-H1000-W1000-U3,1000 x 1000 mm Double Grey Glass Panel,57
+G-H1000-W1050-U3,1050 x 1000 mm Double Grey Glass Panel,55
+G-H1000-W1100-U3,1100 x 1000 mm Double Grey Glass Panel,33
+G-H1000-W1150-U3,1150 x 1000 mm Double Grey Glass Panel,42
+G-H1000-W1200-U3,1200 x 1000 mm Double Grey Glass Panel,44
+G-H1000-W1250-U3,1250 x 1000 mm Double Grey Glass Panel,46
+G-H1000-W1300-U3,1300 x 1000 mm Double Grey Glass Panel,15
+G-H1000-W1350-U3,1350 x 1000 mm Double Grey Glass Panel,25
+G-H1000-W1400-U3,1400 x 1000 mm Double Grey Glass Panel,23
+G-H1000-W1450-U3,1450 x 1000 mm Double Grey Glass Panel,22
+G-H1000-W1500-U3,1500 x 1000 mm Double Grey Glass Panel,24
+R-FP-958-TM-END-F1,958 mm Top-Mounted End Post (Finish F1),
+R-FP-958-TM-MID-F1,958 mm Top-Mounted Intermediate Post (Finish F1),
+R-FP-958-TM-COR-F1,958 mm Top-Mounted Corner Post (Finish F1),
+R-FP-1000-TM-END-F1,1000 mm Top-Mounted End Post for Post-and-Top-Rail System (Finish F1),
+R-FP-1000-TM-MID-F1,1000 mm Top-Mounted Intermediate Post for Post-and-Top-Rail System (Finish F1),
+R-FP-1000-TM-COR-F1,1000 mm Top-Mounted Corner Post for Post-and-Top-Rail System (Finish F1),
+R-HP-448-TM-F1,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F1),
+R-HP-448-TM-F2,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F2),
+R-HP-628-SM-F1,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F1),
+R-HP-628-SM-F2,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F2),
+R-UC-102-TM-F1,102 mm Top-Mounted U-Channel - 2500 mm Standard Length (Finish F1),
+R-UC-102-TM-CUT-F1,102 mm Top-Mounted U-Channel - Custom Cut (Finish F1),
+R-UC-117-SM-F1,117 mm Side-Mounted U-Channel - 2500 mm Standard Length (Finish F1),
+R-UC-117-SM-CUT-F1,117 mm Side-Mounted U-Channel - Custom Cut (Finish F1),

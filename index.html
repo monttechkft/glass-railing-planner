@@ -10,75 +10,7 @@
     <title>Glass railing planner</title>
   </head>
   <body>
-    <main class="page-shell">
-      <header class="hero">
-        <h1>Glass railing planner</h1>
-      </header>
-
-      <div class="workspace">
-        <section class="panel form-panel" aria-labelledby="calculator-heading">
-          <div class="panel-heading">
-            <div>
-              <h2 id="calculator-heading">Input data</h2>
-            </div>
-          </div>
-
-          <button
-            class="primary-button header-calculate-button"
-            type="submit"
-            form="calculator-form"
-          >
-            Calculate plan
-          </button>
-
-          <form id="calculator-form">
-            <div class="field full-width">
-              <label for="system">Railing system</label>
-              <!-- JavaScript fills this list from data/railing_systems.csv. -->
-              <select id="system" name="system"></select>
-            </div>
-
-            <div class="field full-width">
-              <label for="rail-variant">Rail variant</label>
-              <select id="rail-variant" name="railVariant"></select>
-            </div>
-
-            <!-- System-wide controls shared by all four sections. -->
-            <div id="global-system-fields" class="form-grid"></div>
-
-            <!-- JavaScript adds and removes up to four section groups here. -->
-            <div id="sections-container" class="sections-container"></div>
-
-            <div class="section-actions">
-              <button id="add-section" class="secondary-button" type="button">
-                Add section
-              </button>
-              <button id="remove-section" class="secondary-button" type="button">
-                Remove section
-              </button>
-            </div>
-
-            <button class="primary-button" type="submit">Calculate plan</button>
-          </form>
-        </section>
-
-        <section class="panel results-panel" aria-labelledby="results-heading" aria-live="polite">
-          <div class="panel-heading">
-            <div>
-              <h2 id="results-heading">Recommended plan</h2>
-            </div>
-          </div>
-
-          <div id="results-empty" class="empty-state">
-            <div class="empty-mark" aria-hidden="true">↗</div>
-            <p>Enter the section measurements and calculate to see plans.</p>
-          </div>
-          <div id="error-message" class="error-message" role="alert" hidden></div>
-          <div id="results" hidden></div>
-        </section>
-      </div>
-    </main>
-
-    <script type="module" src="/src/main.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
