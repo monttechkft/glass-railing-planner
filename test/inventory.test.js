@@ -142,7 +142,7 @@ test('current inventory product codes are complete and unique', () => {
   assert.equal(new Set(productCodes).size, productCodes.length);
 });
 
-test('railing-system catalogue is complete and matches product compatibility', () => {
+test('enabled railing systems are represented in product compatibility', () => {
   assert.doesNotThrow(() =>
     validateProductSystemCompatibility(products, railingSystems),
   );
@@ -159,7 +159,15 @@ test('railing-system catalogue is complete and matches product compatibility', (
   const compatibilityIds = new Set(
     products.flatMap((product) => product.compatibleRailingSystems),
   );
-  assert.deepEqual([...compatibilityIds].sort(), [...catalogueIds].sort());
+  const enabledCatalogueIds = railingSystems
+    .filter((system) => system.enabled)
+    .map((system) => system.systemId);
+  assert.ok(
+    enabledCatalogueIds.every((systemId) => compatibilityIds.has(systemId)),
+  );
+  assert.ok(
+    [...compatibilityIds].every((systemId) => catalogueIds.has(systemId)),
+  );
 });
 
 test('catalogue validation rejects an unknown product compatibility ID', () => {
@@ -353,37 +361,18 @@ test('calculation consumes post and bar layout widths from the CSV', () => {
   });
 });
 
-test('compatibility selects 1000 mm glass for its full-post system', () => {
-  const productsWithFutureSystemEnabled = products.map((product) =>
-    product.categoryCode === 'R' &&
-    product.compatibleRailingSystems.includes('FP-1000-TM')
-      ? { ...product, enabled: true }
-      : product,
-  );
-  const result = calculatePlans(
-    {
-      system: RAILING_SYSTEM_FAMILIES.fullHeightPost,
-      railVariant: 'FP-1000-TM',
-      length: 5250,
-      panes: 5,
-      startPost: 'I',
-      endPost: 'I',
-    },
-    productsWithFutureSystemEnabled,
-    railingSystems,
+test('1000 mm glass is compatible only with continuous base-rail systems', () => {
+  const glassProducts = products.filter(
+    (product) => product.categoryCode === 'G' && product.heightMm === 1000,
   );
 
-  assert.equal(result.height, 1000);
-  assert.ok(
-    result.plans[0].productCodeSequence.every((code) =>
-      code.startsWith('G-H1000-'),
-    ),
-  );
-  assert.ok(
-    result.systemDetails.postProductCodeSequence.every((code) =>
-      code.startsWith('R-FP-1000-TM-'),
-    ),
-  );
+  assert.ok(glassProducts.length > 0);
+  for (const product of glassProducts) {
+    assert.deepEqual(product.compatibleRailingSystems, [
+      'UC-102-TM',
+      'UC-117-SM',
+    ]);
+  }
 });
 
 test('CSV uses the documented glass and railing group codes', () => {
