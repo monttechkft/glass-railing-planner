@@ -156,6 +156,18 @@ function readOptionalInteger(value, columnName, rowNumber, fileLabel) {
   return number;
 }
 
+/** Read tracked stock, treating an explicit N/A marker as not applicable. */
+function readStockQuantity(value, rowNumber) {
+  const normalized = value.trim();
+  if (normalized === '') {
+    throw new InventoryCsvError(
+      `Stock row ${rowNumber}: stockQuantity must be a whole number or N/A; empty cells are not allowed.`,
+    );
+  }
+  if (normalized.toUpperCase() === 'N/A') return null;
+  return readOptionalInteger(value, 'stockQuantity', rowNumber, 'Stock');
+}
+
 /** Convert the explicit enabled flag instead of relying on non-empty text. */
 function readBoolean(value, columnName, rowNumber, fileLabel) {
   const normalized = value.trim().toLowerCase();
@@ -347,12 +359,7 @@ export function parseProductStockCsv(csvText) {
     const stock = {
       productCode: values.productCode,
       productName: values.productName,
-      stockQuantity: readOptionalInteger(
-        values.stockQuantity,
-        'stockQuantity',
-        rowNumber,
-        'Stock',
-      ),
+      stockQuantity: readStockQuantity(values.stockQuantity, rowNumber),
     };
     requireValue(stock, 'productCode', rowNumber, 'Stock');
     requireValue(stock, 'productName', rowNumber, 'Stock');
@@ -411,16 +418,29 @@ export function mergeProductData(products, prices, stockRecords) {
     stockRecords.map((stock) => [stock.productCode, stock]),
   );
 
-  const missingGlassStockCodes = products
+  const missingNumericStockCodes = products
     .filter(
       (product) =>
-        product.categoryCode === PRODUCT_CATEGORY_CODES.glass &&
+        product.componentType !== 'baseRailCustomCut' &&
         stockByCode.get(product.productCode)?.stockQuantity === null,
     )
     .map((product) => product.productCode);
-  if (missingGlassStockCodes.length > 0) {
+  if (missingNumericStockCodes.length > 0) {
     throw new InventoryCsvError(
-      `The stock CSV is missing glass product codes: ${missingGlassStockCodes.join(', ')}.`,
+      `The stock CSV requires a numeric quantity for these products: ${missingNumericStockCodes.join(', ')}.`,
+    );
+  }
+
+  const customCutsWithNumericStock = products
+    .filter(
+      (product) =>
+        product.componentType === 'baseRailCustomCut' &&
+        stockByCode.get(product.productCode)?.stockQuantity !== null,
+    )
+    .map((product) => product.productCode);
+  if (customCutsWithNumericStock.length > 0) {
+    throw new InventoryCsvError(
+      `The stock CSV must use N/A for custom-cut products: ${customCutsWithNumericStock.join(', ')}.`,
     );
   }
 

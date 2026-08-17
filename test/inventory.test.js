@@ -115,6 +115,25 @@ test('separate CSV files preserve and join all product data', () => {
     priceUnit: 'piece',
     stockQuantity: 139,
   });
+  assert.equal(
+    products.find(
+      (product) => product.productCode === 'R-UC-102-TM-CUT-F1',
+    ).stockQuantity,
+    null,
+  );
+  assert.equal(
+    products.find(
+      (product) => product.productCode === 'R-UC-117-SM-CUT-F1',
+    ).stockQuantity,
+    null,
+  );
+  products
+    .filter(
+      (product) =>
+        product.categoryCode === PRODUCT_CATEGORY_CODES.railingComponent &&
+        product.componentType !== 'baseRailCustomCut',
+    )
+    .forEach((product) => assert.equal(product.stockQuantity, 0));
 });
 
 test('current inventory product codes are complete and unique', () => {
@@ -516,5 +535,68 @@ test('joined data rejects copied rows with mismatched product names', () => {
   assert.throws(
     () => mergeProductData(productDefinitions, productPrices, renamedStock),
     /productName must match products.csv/,
+  );
+});
+
+test('N/A stock remains invalid for every product except custom cuts', () => {
+  const stockWithoutFirstGlassQuantity = productStock.map((row, index) =>
+    index === 0 ? { ...row, stockQuantity: null } : row,
+  );
+
+  assert.throws(
+    () =>
+      mergeProductData(
+        productDefinitions,
+        productPrices,
+        stockWithoutFirstGlassQuantity,
+      ),
+    /stock CSV requires a numeric quantity/,
+  );
+
+  const postIndex = productDefinitions.findIndex(
+    (product) => product.componentType === 'endPost',
+  );
+  const stockWithoutPostQuantity = productStock.map((row, index) =>
+    index === postIndex ? { ...row, stockQuantity: null } : row,
+  );
+  assert.throws(
+    () =>
+      mergeProductData(
+        productDefinitions,
+        productPrices,
+        stockWithoutPostQuantity,
+      ),
+    /stock CSV requires a numeric quantity/,
+  );
+});
+
+test('custom-cut products require N/A stock', () => {
+  const customCutIndex = productDefinitions.findIndex(
+    (product) => product.componentType === 'baseRailCustomCut',
+  );
+  const numericCustomCutStock = productStock.map((row, index) =>
+    index === customCutIndex ? { ...row, stockQuantity: 0 } : row,
+  );
+
+  assert.throws(
+    () =>
+      mergeProductData(
+        productDefinitions,
+        productPrices,
+        numericCustomCutStock,
+      ),
+    /must use N\/A for custom-cut products/,
+  );
+});
+
+test('stock CSV rejects empty quantities', () => {
+  const blankStockCsv = [
+    REQUIRED_STOCK_COLUMNS.join(','),
+    'G-H850-W900-U1,900 x 850 mm Clear Glass Panel,',
+  ].join('\n');
+
+  assert.throws(
+    () => parseProductStockCsv(blankStockCsv),
+    /empty cells are not allowed/,
   );
 });

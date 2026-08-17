@@ -177,8 +177,10 @@ base-rail custom cuts.
 Tracked stock comes from `data/product_stock.csv`, whose required columns are
 `productCode`, `productName`, and `stockQuantity`. Every product has one stock
 row because the sheets deliberately use the same row order. Glass quantities
-are required because they affect plan ranking; an untracked railing-component
-quantity remains an empty cell.
+are required because they affect plan ranking. Every stock cell must contain a
+non-negative whole number, including `0`, except the two custom-cut service
+products, which must use `N/A`. Empty cells are rejected, and `N/A` is rejected
+for glass panels, posts, and standard base-rail products.
 
 All three files must contain exactly the same products in the same order. Both
 `productCode` and `productName` are repeated so rows remain recognizable in

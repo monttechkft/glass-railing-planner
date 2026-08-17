@@ -48,7 +48,9 @@ verification of the framework-independent JavaScript modules.
 - `data/product_prices.csv` repeats `productCode` and `productName` and stores
   `priceHuf` and `priceUnit` for every product.
 - `data/product_stock.csv` repeats `productCode` and `productName` and stores
-  `stockQuantity`. Every product has a row; untracked railing stock is empty.
+  `stockQuantity`. Every product has a row. The two `baseRailCustomCut` products
+  must use `N/A`; every other product must use a non-negative whole number,
+  including zero. Empty cells are invalid.
 - `data/railing_systems.csv` is the active embedded catalogue for railing-system
   families and variants. Its row order controls the form order, and `enabled`
   controls whether a variant can be selected.

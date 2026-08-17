@@ -73,17 +73,17 @@ G-H1000-W1350-U3,1350 x 1000 mm Double Grey Glass Panel,25
 G-H1000-W1400-U3,1400 x 1000 mm Double Grey Glass Panel,23
 G-H1000-W1450-U3,1450 x 1000 mm Double Grey Glass Panel,22
 G-H1000-W1500-U3,1500 x 1000 mm Double Grey Glass Panel,24
-R-FP-958-TM-END-F1,958 mm Top-Mounted End Post (Finish F1),
-R-FP-958-TM-MID-F1,958 mm Top-Mounted Intermediate Post (Finish F1),
-R-FP-958-TM-COR-F1,958 mm Top-Mounted Corner Post (Finish F1),
-R-FP-1000-TM-END-F1,1000 mm Top-Mounted End Post for Post-and-Top-Rail System (Finish F1),
-R-FP-1000-TM-MID-F1,1000 mm Top-Mounted Intermediate Post for Post-and-Top-Rail System (Finish F1),
-R-FP-1000-TM-COR-F1,1000 mm Top-Mounted Corner Post for Post-and-Top-Rail System (Finish F1),
-R-HP-448-TM-F1,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F1),
-R-HP-448-TM-F2,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F2),
-R-HP-628-SM-F1,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F1),
-R-HP-628-SM-F2,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F2),
-R-UC-102-TM-F1,102 mm Top-Mounted U-Channel - 2500 mm Standard Length (Finish F1),
-R-UC-102-TM-CUT-F1,102 mm Top-Mounted U-Channel - Custom Cut (Finish F1),
-R-UC-117-SM-F1,117 mm Side-Mounted U-Channel - 2500 mm Standard Length (Finish F1),
-R-UC-117-SM-CUT-F1,117 mm Side-Mounted U-Channel - Custom Cut (Finish F1),
+R-FP-958-TM-END-F1,958 mm Top-Mounted End Post (Finish F1),0
+R-FP-958-TM-MID-F1,958 mm Top-Mounted Intermediate Post (Finish F1),0
+R-FP-958-TM-COR-F1,958 mm Top-Mounted Corner Post (Finish F1),0
+R-FP-1000-TM-END-F1,1000 mm Top-Mounted End Post for Post-and-Top-Rail System (Finish F1),0
+R-FP-1000-TM-MID-F1,1000 mm Top-Mounted Intermediate Post for Post-and-Top-Rail System (Finish F1),0
+R-FP-1000-TM-COR-F1,1000 mm Top-Mounted Corner Post for Post-and-Top-Rail System (Finish F1),0
+R-HP-448-TM-F1,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F1),0
+R-HP-448-TM-F2,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F2),0
+R-HP-628-SM-F1,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F1),0
+R-HP-628-SM-F2,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F2),0
+R-UC-102-TM-F1,102 mm Top-Mounted U-Channel - 2500 mm Standard Length (Finish F1),0
+R-UC-102-TM-CUT-F1,102 mm Top-Mounted U-Channel - Custom Cut (Finish F1),N/A
+R-UC-117-SM-F1,117 mm Side-Mounted U-Channel - 2500 mm Standard Length (Finish F1),0
+R-UC-117-SM-CUT-F1,117 mm Side-Mounted U-Channel - Custom Cut (Finish F1),N/A
