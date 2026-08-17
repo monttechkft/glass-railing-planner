@@ -1,0 +1,89 @@
+productCode,productName,categoryCode,categoryName,groupCode,groupName,componentType,compatibleRailingSystems,finishCode,finishName,widthMm,heightMm,layoutWidthMm,enabled
+G-H850-W900-U1,900 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,900,850,900,true
+G-H850-W950-U1,950 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,950,850,950,true
+G-H850-W1000-U1,1000 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1000,850,1000,true
+G-H850-W1050-U1,1050 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1050,850,1050,true
+G-H850-W1100-U1,1100 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1100,850,1100,true
+G-H850-W1150-U1,1150 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1150,850,1150,true
+G-H850-W1200-U1,1200 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1200,850,1200,true
+G-H850-W1250-U1,1250 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1250,850,1250,true
+G-H850-W1300-U1,1300 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1300,850,1300,true
+G-H850-W1500-U1,1500 x 850 mm Clear Glass Panel,G,Glass Panel,G-H850,850 mm Glass Panel,glassPanel,FP-958-TM,U1,Clear,1500,850,1500,true
+G-H900-W850-U1,850 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,850,900,850,true
+G-H900-W900-U1,900 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,900,900,900,true
+G-H900-W950-U1,950 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,950,900,950,true
+G-H900-W1000-U1,1000 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,1000,900,1000,true
+G-H900-W1050-U1,1050 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,1050,900,1050,true
+G-H900-W1100-U1,1100 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,1100,900,1100,true
+G-H900-W1150-U1,1150 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,1150,900,1150,true
+G-H900-W1200-U1,1200 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,1200,900,1200,true
+G-H900-W1500-U1,1500 x 900 mm Clear Glass Panel,G,Glass Panel,G-H900,900 mm Glass Panel,glassPanel,"HP-448-TM, HP-628-SM",U1,Clear,1500,900,1500,true
+G-H1000-W400-U1,400 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,400,1000,400,true
+G-H1000-W500-U1,500 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,500,1000,500,true
+G-H1000-W600-U1,600 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,600,1000,600,true
+G-H1000-W700-U1,700 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,700,1000,700,true
+G-H1000-W800-U1,800 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,800,1000,800,true
+G-H1000-W850-U1,850 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,850,1000,850,true
+G-H1000-W900-U1,900 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,900,1000,900,true
+G-H1000-W950-U1,950 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,950,1000,950,true
+G-H1000-W1000-U1,1000 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1000,1000,1000,true
+G-H1000-W1050-U1,1050 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1050,1000,1050,true
+G-H1000-W1100-U1,1100 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1100,1000,1100,true
+G-H1000-W1150-U1,1150 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1150,1000,1150,true
+G-H1000-W1200-U1,1200 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1200,1000,1200,true
+G-H1000-W1250-U1,1250 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1250,1000,1250,true
+G-H1000-W1300-U1,1300 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1300,1000,1300,true
+G-H1000-W1350-U1,1350 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1350,1000,1350,true
+G-H1000-W1400-U1,1400 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1400,1000,1400,true
+G-H1000-W1450-U1,1450 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1450,1000,1450,true
+G-H1000-W1500-U1,1500 x 1000 mm Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U1,Clear,1500,1000,1500,true
+G-H1000-W400-U2,400 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,400,1000,400,true
+G-H1000-W500-U2,500 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,500,1000,500,true
+G-H1000-W600-U2,600 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,600,1000,600,true
+G-H1000-W700-U2,700 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,700,1000,700,true
+G-H1000-W800-U2,800 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,800,1000,800,true
+G-H1000-W850-U2,850 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,850,1000,850,true
+G-H1000-W900-U2,900 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,900,1000,900,true
+G-H1000-W950-U2,950 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,950,1000,950,true
+G-H1000-W1000-U2,1000 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1000,1000,1000,true
+G-H1000-W1050-U2,1050 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1050,1000,1050,true
+G-H1000-W1100-U2,1100 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1100,1000,1100,true
+G-H1000-W1150-U2,1150 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1150,1000,1150,true
+G-H1000-W1200-U2,1200 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1200,1000,1200,true
+G-H1000-W1250-U2,1250 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1250,1000,1250,true
+G-H1000-W1300-U2,1300 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1300,1000,1300,true
+G-H1000-W1400-U2,1400 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1400,1000,1400,true
+G-H1000-W1500-U2,1500 x 1000 mm Grey / Clear Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U2,Grey / Clear,1500,1000,1500,true
+G-H1000-W400-U3,400 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,400,1000,400,true
+G-H1000-W500-U3,500 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,500,1000,500,true
+G-H1000-W600-U3,600 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,600,1000,600,true
+G-H1000-W700-U3,700 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,700,1000,700,true
+G-H1000-W800-U3,800 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,800,1000,800,true
+G-H1000-W850-U3,850 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,850,1000,850,true
+G-H1000-W900-U3,900 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,900,1000,900,true
+G-H1000-W950-U3,950 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,950,1000,950,true
+G-H1000-W1000-U3,1000 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1000,1000,1000,true
+G-H1000-W1050-U3,1050 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1050,1000,1050,true
+G-H1000-W1100-U3,1100 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1100,1000,1100,true
+G-H1000-W1150-U3,1150 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1150,1000,1150,true
+G-H1000-W1200-U3,1200 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1200,1000,1200,true
+G-H1000-W1250-U3,1250 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1250,1000,1250,true
+G-H1000-W1300-U3,1300 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1300,1000,1300,true
+G-H1000-W1350-U3,1350 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1350,1000,1350,true
+G-H1000-W1400-U3,1400 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1400,1000,1400,true
+G-H1000-W1450-U3,1450 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1450,1000,1450,true
+G-H1000-W1500-U3,1500 x 1000 mm Double Grey Glass Panel,G,Glass Panel,G-H1000,1000 mm Glass Panel,glassPanel,"FP-1000-TM, FP-1266-SM, UC-102-TM, UC-117-SM",U3,Double Grey,1500,1000,1500,true
+R-FP-958-TM-END-F1,958 mm Top-Mounted End Post (Finish F1),R,Railing Component,R-FP-958-TM,958 mm Top-Mounted Full-Height Post System,endPost,FP-958-TM,F1,,,958,85,true
+R-FP-958-TM-MID-F1,958 mm Top-Mounted Intermediate Post (Finish F1),R,Railing Component,R-FP-958-TM,958 mm Top-Mounted Full-Height Post System,intermediatePost,FP-958-TM,F1,,,958,30,true
+R-FP-958-TM-COR-F1,958 mm Top-Mounted Corner Post (Finish F1),R,Railing Component,R-FP-958-TM,958 mm Top-Mounted Full-Height Post System,cornerPost,FP-958-TM,F1,,,958,115,true
+R-FP-1000-TM-END-F1,1000 mm Top-Mounted End Post for Post-and-Top-Rail System (Finish F1),R,Railing Component,R-FP-1000-TM,1000 mm Top-Mounted Post-and-Top-Rail System,endPost,FP-1000-TM,F1,,,1000,85,false
+R-FP-1000-TM-MID-F1,1000 mm Top-Mounted Intermediate Post for Post-and-Top-Rail System (Finish F1),R,Railing Component,R-FP-1000-TM,1000 mm Top-Mounted Post-and-Top-Rail System,intermediatePost,FP-1000-TM,F1,,,1000,30,false
+R-FP-1000-TM-COR-F1,1000 mm Top-Mounted Corner Post for Post-and-Top-Rail System (Finish F1),R,Railing Component,R-FP-1000-TM,1000 mm Top-Mounted Post-and-Top-Rail System,cornerPost,FP-1000-TM,F1,,,1000,115,false
+R-HP-448-TM-F1,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F1),R,Railing Component,R-HP-448-TM,448 mm Top-Mounted Half-Height Post,multiPositionPost,HP-448-TM,F1,,,448,,true
+R-HP-448-TM-F2,448 mm Top-Mounted Half-Height Multi-Position Post (Finish F2),R,Railing Component,R-HP-448-TM,448 mm Top-Mounted Half-Height Post,multiPositionPost,HP-448-TM,F2,,,448,,false
+R-HP-628-SM-F1,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F1),R,Railing Component,R-HP-628-SM,628 mm Side-Mounted Half-Height Post,multiPositionPost,HP-628-SM,F1,,,628,,true
+R-HP-628-SM-F2,628 mm Side-Mounted Half-Height Multi-Position Post (Finish F2),R,Railing Component,R-HP-628-SM,628 mm Side-Mounted Half-Height Post,multiPositionPost,HP-628-SM,F2,,,628,,false
+R-UC-102-TM-F1,102 mm Top-Mounted U-Channel - 2500 mm Standard Length (Finish F1),R,Railing Component,R-UC-102-TM,102 mm Top-Mounted Continuous U-Channel System,baseRailBar,UC-102-TM,F1,,2500,102,2500,true
+R-UC-102-TM-CUT-F1,102 mm Top-Mounted U-Channel - Custom Cut (Finish F1),R,Railing Component,R-UC-102-TM,102 mm Top-Mounted Continuous U-Channel System,baseRailCustomCut,UC-102-TM,F1,,,102,,true
+R-UC-117-SM-F1,117 mm Side-Mounted U-Channel - 2500 mm Standard Length (Finish F1),R,Railing Component,R-UC-117-SM,117 mm Side-Mounted Continuous U-Channel System,baseRailBar,UC-117-SM,F1,,2500,117,2500,true
+R-UC-117-SM-CUT-F1,117 mm Side-Mounted U-Channel - Custom Cut (Finish F1),R,Railing Component,R-UC-117-SM,117 mm Side-Mounted Continuous U-Channel System,baseRailCustomCut,UC-117-SM,F1,,,117,,true

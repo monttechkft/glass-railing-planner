@@ -1,21 +1,42 @@
-import productCsvText from '../glass_inventory.csv?raw';
+import productCsvText from '../data/products.csv?raw';
+import productPriceCsvText from '../data/product_prices.csv?raw';
+import productStockCsvText from '../data/product_stock.csv?raw';
+import railingSystemCsvText from '../data/railing_systems.csv?raw';
 import {
   calculateCustomCutPrice,
   calculateProject,
   CalculatorError,
-  RAIL_VARIANTS,
 } from './calculator.js';
-import { InventoryCsvError, parseInventoryCsv } from './inventory.js';
+import {
+  InventoryCsvError,
+  mergeProductData,
+  parseProductPricesCsv,
+  parseProductsCsv,
+  parseProductStockCsv,
+} from './inventory.js';
+import {
+  getSystemsForFamily,
+  parseRailingSystemsCsv,
+  RAILING_SYSTEM_FAMILIES,
+  RailingSystemCsvError,
+  validateProductSystemCompatibility,
+} from './railingSystems.js';
 import './style.css';
 
 const SECTION_COUNT = 4;
-const DISABLED_RAIL_VARIANTS = new Set(['1000-top', '1266-side']);
 let products = [];
-let productDataError = null;
+let railingSystems = [];
+let dataError = null;
 try {
-  products = parseInventoryCsv(productCsvText);
+  products = mergeProductData(
+    parseProductsCsv(productCsvText),
+    parseProductPricesCsv(productPriceCsvText),
+    parseProductStockCsv(productStockCsvText),
+  );
+  railingSystems = parseRailingSystemsCsv(railingSystemCsvText);
+  validateProductSystemCompatibility(products, railingSystems);
 } catch (error) {
-  productDataError = error;
+  dataError = error;
 }
 const productsByCode = new Map(
   products.map((product) => [product.productCode, product]),
@@ -61,13 +82,24 @@ function formatHuf(value) {
   return `${new Intl.NumberFormat('en-US').format(value)} HUF`;
 }
 
-/** Look up one required inventory price using its stable product code. */
-function getProductPrice(productCode) {
+/** Look up one required product used while building a bill of materials. */
+function getProduct(productCode) {
   const product = productsByCode.get(productCode);
   if (!product) {
     throw new InventoryCsvError(`No product exists for code "${productCode}".`);
   }
-  return product.price;
+  return product;
+}
+
+/** Look up one required inventory price and optionally verify its sales unit. */
+function getProductPrice(productCode, expectedPriceUnit = null) {
+  const product = getProduct(productCode);
+  if (expectedPriceUnit && product.priceUnit !== expectedPriceUnit) {
+    throw new InventoryCsvError(
+      `Product "${productCode}" must be priced by ${expectedPriceUnit}.`,
+    );
+  }
+  return product.priceHuf;
 }
 
 /** Create an element and optionally assign a class and safe text content. */
@@ -140,7 +172,7 @@ function createSectionInputGroup(sectionNumber) {
   fieldset.append(createElement('legend', null, `Section ${sectionNumber}`));
   const grid = createElement('div', 'form-grid');
 
-  if (systemSelect.value === '958') {
+  if (systemSelect.value === RAILING_SYSTEM_FAMILIES.fullHeightPost) {
     grid.append(
       createSelectField({
         id: `${prefix}-start-post`,
@@ -206,7 +238,7 @@ function renderSectionInputs() {
 function renderGlobalSystemFields() {
   globalSystemFields.replaceChildren();
 
-  if (systemSelect.value === 'general') {
+  if (systemSelect.value === RAILING_SYSTEM_FAMILIES.halfHeightPost) {
     globalSystemFields.append(
       createNumberField({
         id: 'global-gap',
@@ -217,7 +249,9 @@ function renderGlobalSystemFields() {
         unit: 'mm',
       }),
     );
-  } else if (systemSelect.value === 'vonalmenti') {
+  } else if (
+    systemSelect.value === RAILING_SYSTEM_FAMILIES.continuousBaseRail
+  ) {
     globalSystemFields.append(
       createNumberField({
         id: 'global-gap',
@@ -275,13 +309,26 @@ function readFormInput() {
   };
 }
 
-/** Rebuild the shared rail variants and the four system-specific sections. */
+/** Populate each calculation family once, preserving catalogue row order. */
+function renderRailingSystemFamilies() {
+  systemSelect.replaceChildren();
+  const renderedFamilyIds = new Set();
+  railingSystems.forEach((system) => {
+    if (renderedFamilyIds.has(system.systemFamilyId)) return;
+    const option = createElement('option', null, system.systemFamilyName);
+    option.value = system.systemFamilyId;
+    systemSelect.append(option);
+    renderedFamilyIds.add(system.systemFamilyId);
+  });
+}
+
+/** Rebuild the selected family's variants and its system-specific fields. */
 function updateSystemFields() {
   railVariantSelect.replaceChildren();
-  Object.entries(RAIL_VARIANTS[systemSelect.value]).forEach(([value, label]) => {
-    const option = createElement('option', null, label);
-    option.value = value;
-    option.disabled = DISABLED_RAIL_VARIANTS.has(value);
+  getSystemsForFamily(railingSystems, systemSelect.value).forEach((system) => {
+    const option = createElement('option', null, system.systemName);
+    option.value = system.systemId;
+    option.disabled = !system.enabled;
     railVariantSelect.append(option);
   });
   renderGlobalSystemFields();
@@ -300,6 +347,7 @@ function renderGlassBillOfMaterials(calculatedSections) {
       const width = plan.sequence[index];
       const current = counts.get(productCode) ?? {
         productCode,
+        productName: getProduct(productCode).productName,
         height: result.height,
         width,
         unitPrice: getProductPrice(productCode),
@@ -323,6 +371,7 @@ function renderGlassBillOfMaterials(calculatedSections) {
   const headRow = document.createElement('tr');
   [
     'Product code',
+    'Product name',
     'Quantity',
     'Line total',
     'Unit price',
@@ -337,6 +386,7 @@ function renderGlassBillOfMaterials(calculatedSections) {
     const row = document.createElement('tr');
     row.append(
       createElement('td', null, item.productCode),
+      createElement('td', null, item.productName),
       createElement('td', null, String(item.quantity)),
       createElement('td', null, formatMillimetres(item.width * item.quantity)),
       createElement('td', null, formatHuf(item.unitPrice)),
@@ -356,7 +406,7 @@ function renderGlassBillOfMaterials(calculatedSections) {
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
   const totalLabel = createElement('th', null, 'Glass total');
-  totalLabel.colSpan = 2;
+  totalLabel.colSpan = 3;
   footRow.append(
     totalLabel,
     createElement('td', null, formatMillimetres(totalWidth)),
@@ -377,7 +427,13 @@ function renderPostBillOfMaterials(rows) {
   const caption = createElement('caption', null, 'Post bill of materials');
   const head = document.createElement('thead');
   const headRow = document.createElement('tr');
-  ['Product code', 'Quantity', 'Unit price', 'Total price'].forEach((label) => {
+  [
+    'Product code',
+    'Product name',
+    'Quantity',
+    'Unit price',
+    'Total price',
+  ].forEach((label) => {
     headRow.append(createElement('th', null, label));
   });
   head.append(headRow);
@@ -386,10 +442,12 @@ function renderPostBillOfMaterials(rows) {
   const activeRows = rows.filter((row) => row.quantity > 0);
   activeRows
     .forEach((item) => {
-      const unitPrice = getProductPrice(item.name);
+      const product = getProduct(item.productCode);
+      const unitPrice = getProductPrice(item.productCode);
       const row = document.createElement('tr');
       row.append(
-        createElement('td', null, item.name),
+        createElement('td', null, item.productCode),
+        createElement('td', null, product.productName),
         createElement('td', null, String(item.quantity)),
         createElement('td', null, formatHuf(unitPrice)),
         createElement('td', null, formatHuf(unitPrice * item.quantity)),
@@ -399,13 +457,15 @@ function renderPostBillOfMaterials(rows) {
 
   const totalQuantity = activeRows.reduce((sum, row) => sum + row.quantity, 0);
   const totalPrice = activeRows.reduce(
-    (sum, row) => sum + getProductPrice(row.name) * row.quantity,
+    (sum, row) => sum + getProductPrice(row.productCode) * row.quantity,
     0,
   );
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
+  const totalLabel = createElement('th', null, 'Post total');
+  totalLabel.colSpan = 2;
   footRow.append(
-    createElement('th', null, 'Post total'),
+    totalLabel,
     createElement('td', null, String(totalQuantity)),
     createElement('td'),
     createElement('td', null, formatHuf(totalPrice)),
@@ -420,7 +480,7 @@ function renderPostBillOfMaterials(rows) {
 /** Aggregate and render post quantities from all active post-system sections. */
 function renderProjectPostBillOfMaterials(calculatedSections) {
   const firstResult = calculatedSections[0].result;
-  if (firstResult.system === '958') {
+  if (firstResult.system === RAILING_SYSTEM_FAMILIES.fullHeightPost) {
     const totals = calculatedSections.reduce(
       (sum, { result }) => ({
         I: sum.I + result.systemDetails.posts.counts.I,
@@ -431,21 +491,24 @@ function renderProjectPostBillOfMaterials(calculatedSections) {
     );
     const productCodes = firstResult.systemDetails.postProductCodes;
     return renderPostBillOfMaterials([
-      { name: productCodes.I, quantity: totals.I },
-      { name: productCodes.K, quantity: totals.K },
+      { productCode: productCodes.I, quantity: totals.I },
+      { productCode: productCodes.K, quantity: totals.K },
       // Both adjoining sections include the same physical corner post, so the
       // aggregated endpoint count contains every corner twice.
-      { name: productCodes.S, quantity: totals.S / 2 },
+      { productCode: productCodes.S, quantity: totals.S / 2 },
     ]);
   }
 
-  if (firstResult.system === 'general') {
+  if (firstResult.system === RAILING_SYSTEM_FAMILIES.halfHeightPost) {
     const quantity = calculatedSections.reduce(
       (sum, { result }) => sum + result.systemDetails.postCount,
       0,
     );
     return renderPostBillOfMaterials([
-      { name: firstResult.systemDetails.postProductCode, quantity },
+      {
+        productCode: firstResult.systemDetails.postProductCode,
+        quantity,
+      },
     ]);
   }
 
@@ -457,8 +520,10 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   const firstResult = calculatedSections[0].result;
   const { standardBar, customCut } =
     firstResult.systemDetails.profileProductCodes;
-  const barUnitPrice = getProductPrice(standardBar);
-  const customCutPricePerMetre = getProductPrice(customCut);
+  const standardBarProduct = getProduct(standardBar);
+  const customCutProduct = getProduct(customCut);
+  const barUnitPrice = getProductPrice(standardBar, 'piece');
+  const customCutPricePerMetre = getProductPrice(customCut, 'metre');
   let barCount = 0;
   let customCutTotalLength = 0;
 
@@ -473,7 +538,13 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   const caption = createElement('caption', null, 'Base-rail bill of materials');
   const head = document.createElement('thead');
   const headRow = document.createElement('tr');
-  ['Product code', 'Quantity', 'Unit price', 'Total price'].forEach((label) => {
+  [
+    'Product code',
+    'Product name',
+    'Quantity',
+    'Unit price',
+    'Total price',
+  ].forEach((label) => {
     headRow.append(createElement('th', null, label));
   });
   head.append(headRow);
@@ -482,6 +553,7 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   const barRow = document.createElement('tr');
   barRow.append(
     createElement('td', null, standardBar),
+    createElement('td', null, standardBarProduct.productName),
     createElement('td', null, String(barCount)),
     createElement('td', null, formatHuf(barUnitPrice)),
     createElement('td', null, formatHuf(barUnitPrice * barCount)),
@@ -498,6 +570,7 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
     const customCutRow = document.createElement('tr');
     customCutRow.append(
       createElement('td', null, customCut),
+      createElement('td', null, customCutProduct.productName),
       createElement('td', null, formatMetres(customCutTotalLength)),
       createElement('td', null, formatHuf(customCutPricePerMetre)),
       createElement('td', null, formatHuf(customCutTotalPrice)),
@@ -506,8 +579,10 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   }
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
+  const totalLabel = createElement('th', null, 'Base-Rail total');
+  totalLabel.colSpan = 2;
   footRow.append(
-    createElement('th', null, 'Base-Rail total'),
+    totalLabel,
     createElement('td'),
     createElement('td'),
     createElement(
@@ -549,7 +624,7 @@ function createPostChip(post) {
 function renderLayoutSequence(glassSequence, productCodeSequence, result) {
   const wrapper = createElement('div', 'sequence combined-layout');
 
-  if (result.system === 'vonalmenti') {
+  if (result.system === RAILING_SYSTEM_FAMILIES.continuousBaseRail) {
     glassSequence.forEach((width, index) => {
       wrapper.append(
         createGlassChip(width, result.height, productCodeSequence[index]),
@@ -577,7 +652,9 @@ function renderLayoutSequence(glassSequence, productCodeSequence, result) {
 
 /** Build the same left-to-right product-code order shown by the layout boxes. */
 function buildComponentCodeSequence(glassProductCodes, result) {
-  if (result.system === 'vonalmenti') return glassProductCodes;
+  if (result.system === RAILING_SYSTEM_FAMILIES.continuousBaseRail) {
+    return glassProductCodes;
+  }
 
   const sequence = [];
   result.systemDetails.postProductCodeSequence.forEach((postCode, index) => {
@@ -630,7 +707,7 @@ function renderResults(project) {
 
   const postBillOfMaterials = renderProjectPostBillOfMaterials(project.sections);
   if (postBillOfMaterials) article.append(postBillOfMaterials);
-  if (project.system === 'vonalmenti') {
+  if (project.system === RAILING_SYSTEM_FAMILIES.continuousBaseRail) {
     article.append(renderBaseRailBillOfMaterials(project.sections));
   }
 
@@ -646,6 +723,8 @@ function renderError(error) {
     errorMessage.textContent = error.message;
   } else if (error instanceof InventoryCsvError) {
     errorMessage.textContent = `Inventory CSV error: ${error.message}`;
+  } else if (error instanceof RailingSystemCsvError) {
+    errorMessage.textContent = `Railing-system CSV error: ${error.message}`;
   } else {
     errorMessage.textContent = 'An unexpected calculation error occurred.';
   }
@@ -670,13 +749,14 @@ removeSectionButton.addEventListener('click', () => {
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   try {
-    if (productDataError) throw productDataError;
-    renderResults(calculateProject(readFormInput(), products));
+    if (dataError) throw dataError;
+    renderResults(calculateProject(readFormInput(), products, railingSystems));
   } catch (error) {
     renderError(error);
   }
 });
 
 // Start with only Section 1 visible and calculate its default 4000 mm plan.
+renderRailingSystemFamilies();
 updateSystemFields();
 form.requestSubmit();

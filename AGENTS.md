@@ -21,8 +21,9 @@ npm test
 ```
 
 Run `npm test` and `npm run build` after inventory, UI, or calculation changes.
-Also use `node --check src/main.js`, `node --check src/inventory.js`, and
-`node --check src/calculator.js` for direct syntax verification.
+Also use `node --check src/main.js`, `node --check src/inventory.js`,
+`node --check src/railingSystems.js`, and `node --check src/calculator.js` for
+direct syntax verification.
 
 ## Important files
 
@@ -31,19 +32,36 @@ Also use `node --check src/main.js`, `node --check src/inventory.js`, and
 - `src/main.js` creates system-specific form fields, reads inputs, renders
   layouts, and aggregates the bills of materials.
 - `src/calculator.js` contains the calculation engine and validation rules.
-- `src/inventory.js` parses and validates the Excel-editable CSV into product
-  objects named after its columns.
+- `src/inventory.js` parses product, price, and stock CSV files and joins them
+  into calculation-ready product objects using `productCode`.
+- `src/railingSystems.js` parses the railing-system catalogue, exposes the
+  supported calculation-family IDs, and validates product compatibility IDs.
 - `src/style.css` contains all application styling.
-- `glass_inventory.csv` is the active embedded inventory for glass and railing
-  component product records.
-- Its `productGroup` codes use `G-<color>-<height>` for glass and
-  `R-<mounting>-<height>` for railing components (`TM` is Top-Mounted and `SM`
-  is Side-Mounted).
-- `productCategory` uses the compact codes `G` for glass and `R` for railing
-  components; `productCategoryName` stores their readable names.
-- Glass `productName` values use `<width>x<height>mm Glass Panel - <color name>`.
-- `test/inventory.test.js` covers CSV parsing, reordered columns, and a project
-  calculation using parsed product rows.
+- `data/products.csv` stores stable glass and railing-component definitions.
+- `data/product_prices.csv` stores `priceHuf` and `priceUnit` for every product.
+- `data/product_stock.csv` stores tracked `stockQuantity` values. Glass products
+  must have stock rows; railing components may be omitted.
+- `data/railing_systems.csv` is the active embedded catalogue for railing-system
+  families and variants. Its row order controls the form order, and `enabled`
+  controls whether a variant can be selected.
+- Its `groupCode` values use `G-H<height>` for glass. Railing-component groups
+  use `R-<railing system ID>`, such as `R-FP-958-TM`, `R-HP-628-SM`, and
+  `R-UC-102-TM`.
+- `compatibleRailingSystems` is parsed as a list of railing-system IDs. Glass
+  may list multiple systems. Each railing component must list exactly one, and
+  its `groupCode` must equal that system ID prefixed with `R-`.
+- `categoryCode` uses the compact codes `G` for glass and `R` for railing
+  components; `categoryName` stores their readable names.
+- Glass `productCode` values use `G-H<height>-W<width>-<finish>`, and glass
+  `productName` values use `<width> x <height> mm <finish name> Glass Panel`.
+- `componentType` supplies the calculation role (`glassPanel`, the individual
+  full-height post roles, `multiPositionPost`, `baseRailBar`, or
+  `baseRailCustomCut`) so the application does not parse behavior from codes.
+- The three product-data files are joined by exact `productCode`. Unknown,
+  duplicate, and required missing cross-file records are rejected.
+- Only product definitions with `enabled=true` may be selected by calculations.
+- `test/inventory.test.js` covers the three CSV parsers, their validated join,
+  reordered columns, and calculations using the joined product rows.
 - `README.md` contains installation, build, and end-user instructions.
 - `vite.config.js` reads `VITE_BASE_PATH` for GitHub Project Pages builds while
   keeping local development at `/`.
@@ -58,33 +76,35 @@ repository's Project Pages URL structure.
 
 ## Railing systems
 
-The UI names and internal system IDs are:
+The UI names and internal calculation-family IDs are:
 
-- `958`: **Full-Height Post System**, using 850 mm-high glass.
-- `general`: **Half-Height Post System**, using 900 mm-high glass.
-- `vonalmenti`: **Continuous Base-Rail System**, using 1000 mm-high colored
+- `FP`: **Full-Height Post System**, using 850 mm-high glass.
+- `HP`: **Half-Height Post System**, using 900 mm-high glass.
+- `UC`: **Continuous Base-Rail System**, using 1000 mm-high colored
   glass.
 
 ### Rail variants
 
 Full-Height variants:
 
-- `958-top`: 958 mm Top-Mounted; enabled.
-- `1000-top`: 1000 mm Top-Mounted; visible but disabled.
-- `1266-side`: 1266 mm Side-Mounted; visible but disabled.
+- `FP-958-TM`: 958 mm Top-Mounted; enabled.
+- `FP-1000-TM`: 1000 mm Top-Mounted; visible but disabled.
+- `FP-1266-SM`: 1266 mm Side-Mounted; visible but disabled.
 
 Half-Height variants:
 
-- `448-top`: 448 mm Top-Mounted.
-- `628-side`: 628 mm Side-Mounted.
+- `HP-448-TM`: 448 mm Top-Mounted.
+- `HP-628-SM`: 628 mm Side-Mounted.
 
 Continuous Base-Rail variants:
 
-- `102-top`: 102 mm Top-Mounted.
-- `117-side`: 117 mm Side-Mounted.
+- `UC-102-TM`: 102 mm Top-Mounted.
+- `UC-117-SM`: 117 mm Side-Mounted.
 
-Variant definitions live in `RAIL_VARIANTS` in `src/calculator.js`. Disabled UI
-variants are listed in `DISABLED_RAIL_VARIANTS` in `src/main.js`.
+Family and variant names, canonical system IDs, row order, and selectable state
+come from `data/railing_systems.csv`. The `compatibleRailingSystems` values in the
+product inventory reference those canonical IDs. Both glass and railing
+components are selected through that compatibility list.
 
 ## Input behavior
 
@@ -127,8 +147,10 @@ Continuous Base-Rail global fields:
   - tolerance increment: 10 mm;
   - maximum undercut: 200 mm.
 - Only the best plan from the first successful tolerance/width tier is kept.
-- Full-Height post physical widths are `I = 85`, `K = 30`, and `S = 115` mm.
-- Continuous Base-Rail standard profiles are 2500 mm long. Additional custom
+- Full-Height post physical widths are read from the selected products'
+  `layoutWidthMm` values (`I = 85`, `K = 30`, and `S = 115` mm currently).
+- Continuous Base-Rail standard U-channel length is read from the selected
+  product's `layoutWidthMm` value (2500 mm currently). Additional custom
   cuts use the existing weighted cost rule in `optimizeProfiles()`.
 - Do not reintroduce profile offcut/reuse allocation or numbered source-bar
   logic unless explicitly requested. The current profile model is standard
@@ -168,23 +190,24 @@ proportional.
 ## Bills of materials
 
 BoM tables are project-level totals aggregated across every active section.
-Prices are displayed in HUF and come from the inventory CSV. A base-rail
-custom-cut (`-V`) product's `price` is its HUF-per-metre rate and is scaled to
-the required cut length. Its BoM quantity is the aggregated length in metres,
-not a count of custom-cut pieces.
+Product names come from `data/products.csv`; prices are displayed in HUF and
+come from `data/product_prices.csv`. A `baseRailCustomCut` product's price is
+its HUF-per-metre rate and is scaled to the required cut length. Its BoM
+quantity is the aggregated length in metres, not a count of custom-cut pieces.
+All BoM tables scroll horizontally when their columns exceed the panel width.
 
 ### Glass BoM
 
 - Identifies glass items by the selected inventory `productCode`.
-- Contains Product code, Quantity, Line total, Unit price, and Total price
-  columns.
+- Contains Product code, Product name, Quantity, Line total, Unit price, and
+  Total price columns.
 - Base-rail glass colors remain distinct items when grouping inventory.
 
 ### Post BoM
 
 - Shown only for Full-Height and Half-Height systems.
 - Identifies posts by inventory `productCode` and contains Product code,
-  Quantity, Unit price, and Total price columns.
+  Product name, Quantity, Unit price, and Total price columns.
 - Appears separately from the Glass BoM.
 - Full-Height Corner Post quantity applies the divide-by-two rule described
   above.
@@ -192,11 +215,12 @@ not a count of custom-cut pieces.
 ### Base-Rail BoM
 
 - Shown only for the Continuous Base-Rail system.
-- Contains Product code, Quantity, Unit price, and Total price columns.
+- Contains Product code, Product name, Quantity, Unit price, and Total price
+  columns.
 - Appears separately from the Glass BoM.
-- The standard bar item uses the selected `-T` inventory product code.
-- Custom cuts use one row with the selected `-V` inventory product code and the
-  aggregated required length in metres as Quantity.
+- The standard bar item uses the selected `baseRailBar` product code.
+- Custom cuts use one row with the selected `baseRailCustomCut` product code
+  and the aggregated required length in metres as Quantity.
 - The footer label is **Base-Rail total**.
 
 ## UI wording and appearance

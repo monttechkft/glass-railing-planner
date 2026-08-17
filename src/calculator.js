@@ -1,4 +1,8 @@
 import { PRODUCT_CATEGORY_CODES } from './inventory.js';
+import {
+  getSystemsForFamily,
+  RAILING_SYSTEM_FAMILIES,
+} from './railingSystems.js';
 
 // Shared calculation engine for all three railing systems.
 //
@@ -36,46 +40,13 @@ export const VONALMENTI_COLORS = Object.freeze({
   U3: 'U3 (double-sided grey)',
 });
 
-// These values match the productGroup codes in glass_inventory.csv. Keeping
-// them together makes the connection between each railing system and its
-// compatible glass products explicit.
-export const GLASS_PRODUCT_GROUPS = Object.freeze({
-  fullHeight: 'G-U1-850',
-  halfHeight: 'G-U1-900',
-  continuousBase: Object.freeze({
-    U1: 'G-U1-1000',
-    U2: 'G-U2-1000',
-    U3: 'G-U3-1000',
-  }),
-});
-
-// Values are stable internal form identifiers; labels are the text shown in
-// the selector and calculation results.
-export const RAIL_VARIANTS = Object.freeze({
-  958: Object.freeze({
-    '958-top': '958 mm Top-Mounted',
-    '1000-top': '1000 mm Top-Mounted',
-    '1266-side': '1266 mm Side-Mounted',
-  }),
-  general: Object.freeze({
-    '448-top': '448 mm Top-Mounted',
-    '628-side': '628 mm Side-Mounted',
-  }),
-  vonalmenti: Object.freeze({
-    '102-top': '102 mm Top-Mounted',
-    '117-side': '117 mm Side-Mounted',
-  }),
-});
-
-// Connect each form variant to the railing-component rows in the CSV.
-export const RAIL_VARIANT_PRODUCT_GROUPS = Object.freeze({
-  '958-top': 'R-TM-958',
-  '1000-top': 'R-TM-1000',
-  '1266-side': 'R-SM-1266',
-  '448-top': 'R-TM-448',
-  '628-side': 'R-SM-628',
-  '102-top': 'R-TM-102',
-  '117-side': 'R-SM-117',
+// The short I/K/S identifiers are retained in the calculation engine because
+// they also select the physical widths used by the original 958 calculation.
+// Inventory rows identify the same roles explicitly through componentType.
+const FULL_HEIGHT_POST_COMPONENT_TYPES = Object.freeze({
+  I: 'endPost',
+  K: 'intermediatePost',
+  S: 'cornerPost',
 });
 
 /** Error type used for input and no-result messages that can be shown safely. */
@@ -102,7 +73,7 @@ export function autoPanes(total, preferredWidth = DEFAULTS.preferredMaximumWidth
  * Create maximum-width tiers. The search starts at 1100 mm and permits wider
  * product widths only if the narrower glass products cannot produce a plan.
  *
- * @param {{width: number}[]} glassProducts - Available glass product rows.
+ * @param {{widthMm: number}[]} glassProducts - Available glass product rows.
  * @param {number} preferredMaximum - First maximum width to try.
  * @returns {number[]} Sorted maximum-width limits.
  */
@@ -111,7 +82,7 @@ export function buildTiers(
   preferredMaximum = DEFAULTS.preferredMaximumWidth,
 ) {
   const widerWidths = glassProducts
-    .map((product) => product.width)
+    .map((product) => product.widthMm)
     .filter((width) => width > preferredMaximum);
 
   return [...new Set([preferredMaximum, ...widerWidths])].sort((a, b) => a - b);
@@ -130,10 +101,12 @@ function countWidths(combination) {
  * Calculate the largest fraction of a recorded stock quantity used by a plan.
  * Like the Python scripts, this ranks plans but does not enforce stock limits.
  */
-function dependencyRatio(combination, quantityByWidth) {
+function dependencyRatio(combination, stockQuantityByWidth) {
   const counts = countWidths(combination);
   return Math.max(
-    ...[...counts].map(([width, used]) => used / quantityByWidth.get(width)),
+    ...[...counts].map(
+      ([width, used]) => used / stockQuantityByWidth.get(width),
+    ),
   );
 }
 
@@ -199,15 +172,15 @@ export function findCombinations(
   glassProducts,
 ) {
   const usableProducts = glassProducts
-    .filter((product) => product.width <= widthCap)
+    .filter((product) => product.widthMm <= widthCap)
     .slice()
-    .sort((a, b) => a.width - b.width);
+    .sort((a, b) => a.widthMm - b.widthMm);
 
   if (usableProducts.length === 0 || panelCount <= 0) return [];
 
-  const widths = usableProducts.map((product) => product.width);
-  const quantityByWidth = new Map(
-    glassProducts.map((product) => [product.width, product.quantity]),
+  const widths = usableProducts.map((product) => product.widthMm);
+  const stockQuantityByWidth = new Map(
+    glassProducts.map((product) => [product.widthMm, product.stockQuantity]),
   );
   const results = [];
   const lastIndex = widths.length - 1;
@@ -224,7 +197,7 @@ export function findCombinations(
       combination,
       total,
       undercut,
-      dependencyRatio: dependencyRatio(combination, quantityByWidth),
+      dependencyRatio: dependencyRatio(combination, stockQuantityByWidth),
     });
   }
 
@@ -336,8 +309,20 @@ export function prettySequence(combination) {
   return sequence;
 }
 
-/** Calculate 958 post counts, total width, and installation sequence. */
-export function postUsage958(panelCount, start, end) {
+/**
+ * Calculate 958 post counts, total width, and installation sequence.
+ *
+ * @param {number} panelCount - Number of glass panels in the section.
+ * @param {'I'|'S'} start - I for an end post or S for a corner post.
+ * @param {'I'|'S'} end - I for an end post or S for a corner post.
+ * @param {{I:number,K:number,S:number}} postWidthsMm - Installed post widths.
+ */
+export function postUsage958(
+  panelCount,
+  start,
+  end,
+  postWidthsMm = POST_WIDTHS_958,
+) {
   if (!['I', 'S'].includes(start) || !['I', 'S'].includes(end)) {
     throw new CalculatorError('Start and end posts must be I or S.');
   }
@@ -348,9 +333,9 @@ export function postUsage958(panelCount, start, end) {
     S: Number(start === 'S') + Number(end === 'S'),
   };
   const totalWidth =
-    counts.I * POST_WIDTHS_958.I +
-    counts.K * POST_WIDTHS_958.K +
-    counts.S * POST_WIDTHS_958.S;
+    counts.I * postWidthsMm.I +
+    counts.K * postWidthsMm.K +
+    counts.S * postWidthsMm.S;
   const sequence = [
     `958${start}`,
     ...Array(counts.K).fill('958K'),
@@ -370,21 +355,31 @@ function validateInput(input) {
   }
 }
 
-/** Return the display label for a valid system-specific rail variant. */
-function resolveRailVariant(system, selectedVariant) {
-  const variants = RAIL_VARIANTS[system];
-  if (!variants) {
+/** Return one valid catalogue entry for the selected calculation family. */
+function resolveRailVariant(systemFamilyId, selectedSystemId, railingSystems) {
+  if (!Array.isArray(railingSystems)) {
+    throw new CalculatorError(
+      'Railing-system data must be loaded from the catalogue CSV.',
+    );
+  }
+  const familySystems = getSystemsForFamily(railingSystems, systemFamilyId);
+  if (familySystems.length === 0) {
     throw new CalculatorError('Select a supported railing system.');
   }
 
   // Falling back to the first variant keeps direct API calls compatible while
   // the browser form always supplies an explicit value.
-  const variantKey = selectedVariant ?? Object.keys(variants)[0];
-  const label = variants[variantKey];
-  if (!label) {
+  const systemId = selectedSystemId ?? familySystems[0].systemId;
+  const selectedSystem = familySystems.find(
+    (system) => system.systemId === systemId,
+  );
+  if (!selectedSystem) {
     throw new CalculatorError('Select a supported rail variant.');
   }
-  return { key: variantKey, label };
+  return {
+    systemId: selectedSystem.systemId,
+    label: selectedSystem.systemName,
+  };
 }
 
 /**
@@ -394,12 +389,15 @@ function resolveRailVariant(system, selectedVariant) {
  * has a weight of 1, while additional cut length has a weight of 1.3. If two
  * options cost the same, lower waste and then fewer bars are preferred.
  */
-export function optimizeProfiles(totalLength) {
+export function optimizeProfiles(
+  totalLength,
+  barLength = VONALMENTI_PROFILE.barLength,
+) {
   if (totalLength <= 0) {
     return { barCount: 0, cutLength: 0, waste: 0 };
   }
 
-  const { barLength, cutPriceMultiplier } = VONALMENTI_PROFILE;
+  const { cutPriceMultiplier } = VONALMENTI_PROFILE;
   const maximumBars = Math.trunc(totalLength / barLength) + 3;
   let best = null;
 
@@ -436,9 +434,10 @@ export function optimizeProfiles(totalLength) {
  *
  * @param {object} input - Normalized form values in integer millimetres.
  * @param {object[]} products - Product rows parsed from the inventory CSV.
+ * @param {object[]} railingSystems - Parsed railing-system catalogue rows.
  * @returns {object} Section metadata and ranked plans ready for the UI.
  */
-export function calculatePlans(input, products) {
+export function calculatePlans(input, products, railingSystems) {
   validateInput(input);
   if (!Array.isArray(products)) {
     throw new CalculatorError('Product data must be loaded from the inventory CSV.');
@@ -449,38 +448,58 @@ export function calculatePlans(input, products) {
     throw new CalculatorError('Could not determine a valid number of panels.');
   }
 
-  let height;
-  let productGroup;
+  let glassFinishCode = 'U1';
   let target;
   let systemDetails;
-  const railVariant = resolveRailVariant(input.system, input.railVariant);
-  const railProductGroup = RAIL_VARIANT_PRODUCT_GROUPS[railVariant.key];
+  const railVariant = resolveRailVariant(
+    input.system,
+    input.railVariant,
+    railingSystems,
+  );
   const railProducts = products.filter(
     (product) =>
-      product.productCategory === PRODUCT_CATEGORY_CODES.railingComponent &&
-      product.productGroup === railProductGroup,
+      product.categoryCode === PRODUCT_CATEGORY_CODES.railingComponent &&
+      product.compatibleRailingSystems.includes(railVariant.systemId) &&
+      product.enabled,
   );
 
-  if (input.system === '958') {
-    height = 850;
-    productGroup = GLASS_PRODUCT_GROUPS.fullHeight;
-    const posts = postUsage958(panelCount, input.startPost, input.endPost);
-    const postProductCodes = Object.fromEntries(
+  if (input.system === RAILING_SYSTEM_FAMILIES.fullHeightPost) {
+    const postProducts = Object.fromEntries(
       ['I', 'K', 'S'].map((postType) => {
-        const product = railProducts.find((item) =>
-          item.productCode.startsWith(`${railProductGroup}${postType}-`),
+        const product = railProducts.find(
+          (item) =>
+            item.componentType === FULL_HEIGHT_POST_COMPONENT_TYPES[postType] &&
+            item.finishCode === 'F1',
         );
         if (!product) {
           throw new CalculatorError(
             `No ${postType} post product is available for ${railVariant.label}.`,
           );
         }
-        return [postType, product.productCode];
+        return [postType, product];
       }),
+    );
+    const postProductCodes = Object.fromEntries(
+      Object.entries(postProducts).map(([postType, product]) => [
+        postType,
+        product.productCode,
+      ]),
+    );
+    const postWidthsMm = Object.fromEntries(
+      Object.entries(postProducts).map(([postType, product]) => [
+        postType,
+        product.layoutWidthMm,
+      ]),
+    );
+    const posts = postUsage958(
+      panelCount,
+      input.startPost,
+      input.endPost,
+      postWidthsMm,
     );
     target = input.length - posts.totalWidth;
     systemDetails = {
-      type: '958',
+      type: RAILING_SYSTEM_FAMILIES.fullHeightPost,
       railVariant,
       posts,
       postProductCodes,
@@ -489,9 +508,7 @@ export function calculatePlans(input, products) {
       ),
       postCount: panelCount + 1,
     };
-  } else if (input.system === 'general') {
-    height = 900;
-    productGroup = GLASS_PRODUCT_GROUPS.halfHeight;
+  } else if (input.system === RAILING_SYSTEM_FAMILIES.halfHeightPost) {
     if (!Number.isInteger(input.gap) || input.gap < 0) {
       throw new CalculatorError('Panel gap must be zero or greater.');
     }
@@ -500,8 +517,10 @@ export function calculatePlans(input, products) {
     const postCount = panelCount + 1;
     // F1 is currently the chosen post item when a half-height group contains
     // both F1 and F2 inventory alternatives.
-    const postProduct = railProducts.find((product) =>
-      product.productCode.endsWith('-F1'),
+    const postProduct = railProducts.find(
+      (product) =>
+        product.componentType === 'multiPositionPost' &&
+        product.finishCode === 'F1',
     );
     if (!postProduct) {
       throw new CalculatorError(
@@ -509,7 +528,7 @@ export function calculatePlans(input, products) {
       );
     }
     systemDetails = {
-      type: 'general',
+      type: RAILING_SYSTEM_FAMILIES.halfHeightPost,
       railVariant,
       gap: input.gap,
       seamTotal,
@@ -517,8 +536,7 @@ export function calculatePlans(input, products) {
       postProductCode: postProduct.productCode,
       postProductCodeSequence: Array(postCount).fill(postProduct.productCode),
     };
-  } else if (input.system === 'vonalmenti') {
-    height = 1000;
+  } else if (input.system === RAILING_SYSTEM_FAMILIES.continuousBaseRail) {
     if (!Number.isInteger(input.vonalmentiGap) || input.vonalmentiGap < 0) {
       throw new CalculatorError('Panel gap must be zero or greater.');
     }
@@ -526,28 +544,31 @@ export function calculatePlans(input, products) {
       throw new CalculatorError('Select a supported base-rail glass color.');
     }
 
-    productGroup = GLASS_PRODUCT_GROUPS.continuousBase[input.color];
+    glassFinishCode = input.color;
     const seamTotal = input.vonalmentiGap * Math.max(panelCount - 1, 0);
     target = input.length - seamTotal;
 
-    const profileChoice = optimizeProfiles(input.length);
-    const standardBarProduct = railProducts.find((product) =>
-      product.productCode.endsWith('-T'),
+    const standardBarProduct = railProducts.find(
+      (product) => product.componentType === 'baseRailBar',
     );
-    const customCutProduct = railProducts.find((product) =>
-      product.productCode.endsWith('-V'),
+    const customCutProduct = railProducts.find(
+      (product) => product.componentType === 'baseRailCustomCut',
     );
     if (!standardBarProduct || !customCutProduct) {
       throw new CalculatorError(
         `Standard-bar and custom-cut products are required for ${railVariant.label}.`,
       );
     }
+    const profileChoice = optimizeProfiles(
+      input.length,
+      standardBarProduct.layoutWidthMm,
+    );
     systemDetails = {
-      type: 'vonalmenti',
+      type: RAILING_SYSTEM_FAMILIES.continuousBaseRail,
       railVariant,
       gap: input.vonalmentiGap,
       seamTotal,
-      color: input.color,
+      finishCode: input.color,
       profile: profileChoice,
       profileProductCodes: {
         standardBar: standardBarProduct.productCode,
@@ -564,15 +585,28 @@ export function calculatePlans(input, products) {
 
   const glassProducts = products.filter(
     (product) =>
-      product.productCategory === PRODUCT_CATEGORY_CODES.glass &&
-      product.productGroup === productGroup,
+      product.categoryCode === PRODUCT_CATEGORY_CODES.glass &&
+      product.compatibleRailingSystems.includes(railVariant.systemId) &&
+      product.finishCode === glassFinishCode &&
+      product.enabled,
   );
   if (glassProducts.length === 0) {
-    throw new CalculatorError(`No products are available for ${height} mm glass.`);
+    throw new CalculatorError(
+      `No ${glassFinishCode} glass products are available for ${railVariant.label}.`,
+    );
   }
-  if (input.system === 'vonalmenti') {
-    // Keep the displayed color name aligned with the editable CSV column.
-    systemDetails.colorName = glassProducts[0].colorName;
+  const compatibleGlassHeights = [
+    ...new Set(glassProducts.map((product) => product.heightMm)),
+  ];
+  if (compatibleGlassHeights.length !== 1) {
+    throw new CalculatorError(
+      `Compatible glass products for ${railVariant.label} must share one height.`,
+    );
+  }
+  const height = compatibleGlassHeights[0];
+  if (input.system === RAILING_SYSTEM_FAMILIES.continuousBaseRail) {
+    // Keep the selected finish description aligned with the editable CSV.
+    systemDetails.finishName = glassProducts[0].finishName;
   }
 
   const search = searchWithTolerance({
@@ -587,10 +621,10 @@ export function calculatePlans(input, products) {
     );
   }
 
-  // Widths identify products within the already selected glass product group.
+  // Widths identify products within the already selected system and finish.
   // This lookup lets the UI show the exact CSV product code for every panel.
   const productCodeByWidth = new Map(
-    glassProducts.map((product) => [product.width, product.productCode]),
+    glassProducts.map((product) => [product.widthMm, product.productCode]),
   );
 
   return {
@@ -622,9 +656,10 @@ export function calculatePlans(input, products) {
  * @param {object} input - Shared system settings plus up to four sections.
  * @param {object[]} input.sections - Per-section measurements and options.
  * @param {object[]} products - Product rows parsed from the inventory CSV.
+ * @param {object[]} railingSystems - Parsed railing-system catalogue rows.
  * @returns {object} Calculated sections with their original section numbers.
  */
-export function calculateProject(input, products) {
+export function calculateProject(input, products, railingSystems) {
   if (!Array.isArray(input.sections) || input.sections.length === 0) {
     throw new CalculatorError('Enter at least one section.');
   }
@@ -646,7 +681,7 @@ export function calculateProject(input, products) {
 
   // A physical corner post is selected once by each of its two adjoining
   // sections. An odd endpoint count would produce half a post in the BoM.
-  if (input.system === '958') {
+  if (input.system === RAILING_SYSTEM_FAMILIES.fullHeightPost) {
     const cornerEndpointCount = activeSections.reduce(
       (count, section) =>
         count + Number(section.startPost === 'S') + Number(section.endPost === 'S'),
@@ -671,6 +706,7 @@ export function calculateProject(input, products) {
             railVariant: input.railVariant,
           },
           products,
+          railingSystems,
         ),
       };
     } catch (error) {

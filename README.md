@@ -104,9 +104,11 @@ section. Each section has its own length and optional panel count.
 
 The **Gap between panels** and **Glass color** are global values and apply to
 every active section. Each section has its own length and optional panel count.
+The physical base rail is a continuous U-channel fixed to the balcony surface;
+the glass panels are installed directly in this channel without posts.
 
-The aggregated Base-Rail Bill of Materials lists the required 2.5 m bars and
-groups custom cuts by length.
+The aggregated Base-Rail Bill of Materials lists the required 2.5 m U-channel
+profiles and groups custom cuts by length.
 
 ## Understanding the results
 
@@ -124,55 +126,112 @@ groups custom cuts by length.
   section and identifies each item by its inventory `productCode`.
 - The Post or Base-Rail Bill of Materials contains totals for the entire
   project, not separate totals for each section.
-- BoM prices are shown in HUF and come from the CSV `price` column. For
-  base-rail custom-cut (`-V`) products, `price` is interpreted as a per-metre
-  rate. Their BoM quantity is the aggregated required length in metres.
+- Every BoM row shows both the product code and its descriptive `productName`.
+  Wide tables can be scrolled horizontally on smaller screens.
+- BoM prices are shown in HUF and come from `data/product_prices.csv`. Its
+  `priceUnit` column distinguishes products sold by `piece` from base-rail
+  custom cuts sold by `metre`. Custom-cut BoM quantities are aggregated in
+  metres.
 - The planner returns one recommended plan for each active section.
 
-## Inventory data
+## Product data
 
-The application imports its inventory from the Excel-editable
-`glass_inventory.csv` file. The required columns are:
+Product data is separated by ownership and update frequency. Stable definitions
+come from the Excel-editable `data/products.csv` file. Its required columns are:
 
 - `productCode`
 - `productName`
-- `productCategory`
-- `productCategoryName`
-- `productGroup`
-- `productGroupName`
-- `height`
-- `width`
-- `color`
-- `colorName`
-- `price`
-- `quantity`
+- `categoryCode`
+- `categoryName`
+- `groupCode`
+- `groupName`
+- `componentType`
+- `compatibleRailingSystems`
+- `finishCode`
+- `finishName`
+- `widthMm`
+- `heightMm`
+- `layoutWidthMm`
+- `enabled`
 
-The columns may be reordered because the parser uses their header names. Extra
-columns are also allowed and ignored by the application. Keep the required
-names unchanged, and export the edited Excel sheet as UTF-8 CSV with comma
-separators.
+Prices come from `data/product_prices.csv`, whose required columns are
+`productCode`, `priceHuf`, and `priceUnit`. Every defined product must have one
+price row. Use `piece` for products sold individually and `metre` for
+base-rail custom cuts.
 
-The `productCategory` column uses compact codes: `G` for glass and `R` for a
-railing component. The adjacent `productCategoryName` column contains a
-required, freely editable descriptive label; it is not used by calculations.
+Tracked stock comes from `data/product_stock.csv`, whose required columns are
+`productCode` and `stockQuantity`. Every glass product must have one stock row
+because stock availability affects plan ranking. Railing components may be
+omitted when their stock is not tracked.
 
-Glass `productName` values use `<width>x<height>mm Glass Panel - <color name>`,
-for example `900x850mm Glass Panel - Clear`.
+All three files are joined by the exact, case-sensitive `productCode`. Duplicate
+codes, unknown references, missing prices, and missing glass-stock records are
+reported as data errors. Columns may be reordered because each parser uses
+header names. Extra columns are allowed and ignored. Keep the required names
+unchanged, and export edited Excel sheets as UTF-8 CSV with comma separators.
+
+The `categoryCode` column uses compact codes: `G` for glass and `R` for a
+railing component. The adjacent `categoryName` column contains a required,
+freely editable descriptive label; it is not used by calculations.
+
+Glass `productName` values use
+`<width> x <height> mm <finish name> Glass Panel`, for example
+`900 x 850 mm Clear Glass Panel`.
 
 Product groups use a structured code:
 
-- Glass: `G-<color>-<height>`, such as `G-U1-850` or `G-U3-1000`.
-- Railing components: `R-<mounting>-<height>`, where `TM` means Top-Mounted
-  and `SM` means Side-Mounted, such as `R-TM-958` or `R-SM-628`.
+- Glass: `G-H<height>`, such as `G-H850` or `G-H1000`. Different glass
+  finishes can belong to the same height group.
+- Railing components use `R-<railing system ID>`, such as `R-FP-958-TM`,
+  `R-HP-628-SM`, or `R-UC-102-TM`.
 
-Glass product codes use `G-<color>-<width>x<height>`, such as
-`G-U1-900x850`.
+Glass product codes use `G-H<height>-W<width>-<finish>`, such as
+`G-H850-W900-U1`.
 
 Railing-component product codes start with their complete product-group code,
-such as `R-TM-958I-F1` or `R-SM-628-F1`.
+such as `R-FP-958-TM-MID-F1` or `R-HP-628-SM-F1`.
 
-The CSV is included in the Vite bundle, so the deployed application does not
-need Excel, a database, or a separate runtime data request.
+`compatibleRailingSystems` contains comma-separated railing-system IDs. Excel
+quotes cells containing more than one ID automatically. Glass may be compatible
+with multiple systems. Every railing component currently belongs to exactly
+one system, and its `groupCode` must equal `R-<compatible system ID>`.
+The rail-variant form values use these same canonical IDs, and calculations
+select both glass and railing components by membership in this column.
+
+`componentType` is the stable behavior used by the calculator. Current values
+are `glassPanel`, `endPost`, `intermediatePost`, `cornerPost`,
+`multiPositionPost`, `baseRailBar`, and `baseRailCustomCut`. This lets product
+codes and names change without requiring the calculator to decode their text.
+
+`widthMm` and `heightMm` describe the product. `layoutWidthMm` records the
+physical width consumed in a railing layout when applicable. For glass it is
+the same as `widthMm`. Set `enabled` to `true` or `false`; disabled records
+remain in the product catalogue but are not selected by calculations.
+
+The CSV files are included in the Vite bundle, so the deployed application does
+not need Excel, a database, or separate runtime data requests. After editing a
+CSV, rebuild the application or restart the development server.
+
+## Railing-system catalogue
+
+Railing-system families and selectable variants come from the Excel-editable
+`data/railing_systems.csv` file. Its required columns are:
+
+- `systemId` — canonical ID referenced by product compatibility values
+- `systemName` — variant name shown in the Rail variant list
+- `systemFamilyId` — calculation family: `FP`, `HP`, or `UC`
+- `systemFamilyName` — family name shown in the Railing system list
+- `enabled` — `true` makes the variant selectable; `false` keeps it visible but
+  disabled
+
+Rows determine the display order. Each family must have one consistent
+`systemFamilyName`, and all three supported family IDs must be present. Every ID
+listed in a product's `compatibleRailingSystems` cell must exist in this
+catalogue; the application reports a data error if an ID is misspelled or
+missing.
+
+Like the product data files, this CSV is bundled into the application at build
+time.
 
 ## Main project files
 
@@ -180,8 +239,12 @@ need Excel, a database, or a separate runtime data request.
 - `src/main.js` — form creation, user interaction, result rendering, and BoM
   aggregation
 - `src/calculator.js` — railing calculations and plan selection
-- `src/inventory.js` — CSV parsing, column validation, and product normalization
+- `src/inventory.js` — product, price, and stock CSV parsing and validated joins
+- `src/railingSystems.js` — railing-system catalogue parsing and validation
 - `src/style.css` — interface and layout styling
 - `vite.config.js` — local and GitHub Pages base-path configuration
 - `.github/workflows/deploy-pages.yml` — automatic GitHub Pages deployment
-- `glass_inventory.csv` — active Excel-editable product inventory
+- `data/products.csv` — stable Excel-editable product definitions
+- `data/product_prices.csv` — prices and sales units keyed by product code
+- `data/product_stock.csv` — tracked stock quantities keyed by product code
+- `data/railing_systems.csv` — Excel-editable railing-system catalogue

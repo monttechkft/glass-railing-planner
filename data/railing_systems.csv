@@ -1,0 +1,8 @@
+systemId,systemName,systemFamilyId,systemFamilyName,enabled
+FP-958-TM,958 mm Top-Mounted,FP,Full-Height Post System,true
+FP-1000-TM,1000 mm Top-Mounted,FP,Full-Height Post System,false
+FP-1266-SM,1266 mm Side-Mounted,FP,Full-Height Post System,false
+HP-448-TM,448 mm Top-Mounted,HP,Half-Height Post System,true
+HP-628-SM,628 mm Side-Mounted,HP,Half-Height Post System,true
+UC-102-TM,102 mm Top-Mounted,UC,Continuous Base-Rail System,true
+UC-117-SM,117 mm Side-Mounted,UC,Continuous Base-Rail System,true

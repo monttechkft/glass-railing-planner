@@ -40,7 +40,7 @@ select {
 }
 
 .page-shell {
-  width: min(1480px, calc(100% - 40px));
+  width: min(1720px, calc(100% - 40px));
   margin: 0 auto;
   padding: 64px 0 80px;
 }
@@ -69,7 +69,7 @@ h1 {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(330px, 0.72fr) minmax(500px, 1.28fr);
+  grid-template-columns: minmax(350px, 0.58fr) minmax(560px, 1.42fr);
   gap: 22px;
   align-items: start;
 }
@@ -317,10 +317,12 @@ select:focus {
 }
 
 .bom-table-wrapper {
+  max-width: 100%;
   overflow-x: auto;
   margin-bottom: 22px;
   border: 1px solid var(--line);
   border-radius: 10px;
+  scrollbar-width: thin;
 }
 
 .post-bom {
@@ -330,6 +332,7 @@ select:focus {
 
 .bom-table {
   width: 100%;
+  min-width: 850px;
   border-collapse: collapse;
   background: #fff;
   font-size: 0.84rem;
@@ -356,8 +359,20 @@ select:focus {
 
 .bom-table th:first-child,
 .bom-table td:first-child,
+.bom-table th:nth-child(2),
+.bom-table td:nth-child(2),
 .bom-table tfoot th {
   text-align: left;
+}
+
+.bom-table th:first-child,
+.bom-table td:first-child {
+  white-space: nowrap;
+}
+
+.bom-table th:nth-child(2),
+.bom-table td:nth-child(2) {
+  min-width: 280px;
 }
 
 .bom-table thead th {
@@ -367,7 +382,7 @@ select:focus {
   text-transform: uppercase;
 }
 
-.bom-table tbody td:nth-child(2) {
+.bom-table tbody td:nth-child(3) {
   font-weight: 750;
 }
 
@@ -448,7 +463,7 @@ select:focus {
   transform-origin: center;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1060px) {
   .workspace {
     grid-template-columns: 1fr;
   }
@@ -457,7 +472,7 @@ select:focus {
 
 @media (max-width: 620px) {
   .page-shell {
-    width: min(100% - 24px, 1480px);
+    width: min(100% - 24px, 1720px);
     padding: 36px 0 48px;
   }
 
