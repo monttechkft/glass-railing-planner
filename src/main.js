@@ -406,9 +406,12 @@ function renderGlassBillOfMaterials(calculatedSections) {
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
   const totalLabel = createElement('th', null, 'Glass total');
-  totalLabel.colSpan = 3;
+  // Keep an explicit footer cell for every column. This ensures the aggregate
+  // width remains directly below Line total when columns are added or resized.
   footRow.append(
     totalLabel,
+    createElement('td'),
+    createElement('td'),
     createElement('td', null, formatMillimetres(totalWidth)),
     createElement('td'),
     createElement('td', null, formatHuf(totalPrice)),
@@ -455,7 +458,6 @@ function renderPostBillOfMaterials(rows) {
       body.append(row);
     });
 
-  const totalQuantity = activeRows.reduce((sum, row) => sum + row.quantity, 0);
   const totalPrice = activeRows.reduce(
     (sum, row) => sum + getProductPrice(row.productCode) * row.quantity,
     0,
@@ -463,10 +465,10 @@ function renderPostBillOfMaterials(rows) {
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
   const totalLabel = createElement('th', null, 'Post total');
-  totalLabel.colSpan = 2;
   footRow.append(
     totalLabel,
-    createElement('td', null, String(totalQuantity)),
+    createElement('td'),
+    createElement('td'),
     createElement('td'),
     createElement('td', null, formatHuf(totalPrice)),
   );
@@ -580,9 +582,9 @@ function renderBaseRailBillOfMaterials(calculatedSections) {
   const foot = document.createElement('tfoot');
   const footRow = document.createElement('tr');
   const totalLabel = createElement('th', null, 'Base-Rail total');
-  totalLabel.colSpan = 2;
   footRow.append(
     totalLabel,
+    createElement('td'),
     createElement('td'),
     createElement('td'),
     createElement(
